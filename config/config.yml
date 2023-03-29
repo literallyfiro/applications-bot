@@ -1,0 +1,78 @@
+buttons:
+    start_button: |
+        📝 – INIZIA la tua candidatura
+    developer_button: |
+        🧑‍💻 – CONTATTA lo sviluppatore
+    cancel: |
+        ❌ – ANNULLA
+    home: |
+        🏠 – Torna alla HOME
+    start_work: |
+        ✅ – Sono SICURO
+
+types:
+    moderator:
+        name: |
+            🌟 – MODERATORE
+        description: |
+            Il moderatore è una figura importante per il gruppo, è colui che si occupa di controllare il gruppo e di risolvere eventuali problemi che si possono verificare.
+        questions:
+            # if required is false, the bot will say that the answer is optional and there will be a button to skip it
+            1:
+                name: |
+                    » <b>Perché</b> vuoi candidarti per il ruolo di <b>MODERATORE</b>?
+                type: text
+                # required: true
+                min_length: 10
+                max_length: 1000
+            2:
+                name: |
+                    » quanti anni hai
+                type: number
+                # required: true
+                min_length: 0
+                max_length: 0 
+    writer:
+        name: |
+            📚 – SCRITTORE
+        description: |
+            Lo scrittore e' utile.
+        questions: []
+messages:
+    start: |
+        🗳| <b>CANDIDATURE MINECRAFT-TG24</b>
+        » Benvenuto nel <b>BOT</b> di MinecraftTG24 in cui potrai svolgere la tua candidatura per diventare <b>MODERATORE</b> del <b>GRUPPO</b>.
+
+        🤖 – Il nostro <b>BOT</b> ti guiderà nello svolgimento della candidatura, ponendoti diverse domande che ci aiuteranno a capire le tue <b>MOTIVAZIONI</b> e le tue <b>ABILITA'</b> per diventare un moderatore.
+    chooser: |
+        🧊| <b>SCELTA DELLA CANDIDATURA</b>
+
+        Qui potrai scegliere il ruolo per il quale vuoi candidarti. Ricorda che puoi candidarti per un solo ruolo alla volta!
+
+        Se vuoi avere più informazioni su un determinato ruolo, clicca sul pulsante ℹ che si trova accanto ad ogni ruolo!
+    disclaimer: |
+        💡| <b>IMPORTANTE</b>
+        » Prima di iniziare la candidatura, ti consigliamo di leggere attentamente IL <b>REGOLAMENTO</b> del gruppo al seguente link: (https://t.me/MTG24Chat/822694).
+
+        » Avrai a disposizione <b>7 MINUTI</b> per rispondere alle domande, quindi prenditi il tempo necessario per fornire la risposta più adeguata. Ricorda che una volta inviata la risposta, non sarà possibile modificarla!
+
+        👉| Per procedere con la <b>CANDIDATURA</b>, clicca sul pulsante sottostante.
+
+        🐠| Tieni presente che le candidature in forma di <b>TROLL</b> o <b>MEME</b> saranno punite con un <b>BAN PERMANENTE</b> dal bot e un <b>BAN TEMPORANEO</b> dal gruppo.
+    only_numbers_answer: |
+        <b>Questa domanda richiede un numero</b>
+    question_template: |
+        📑 | <b>DOMANDA N. {number}</b>
+        {message}
+        ❌ –  Se desideri <b>ANNULLARE</b> il tuo provino, clicca il <b>BOTTONE</b> qui sotto.
+    work_done: |
+        ✅ <b>Grazie per aver completato la candidatura!</b>
+        <i>Se verrai accettato, te lo faremo sapere tramite questo bot.</i>
+
+        <b>— Purtroppo non possiamo accettare tutti, ma non ti preoccupare, ci saranno altre opportunità in futuro</b>
+    already_in_progress: |
+        Sei gia' in un provino!
+    work_cancelled: |
+        Hai annullato la candidatura.
+    not_in_progress: |
+        Non sei in nessuna candidatura!
