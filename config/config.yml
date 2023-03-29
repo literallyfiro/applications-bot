@@ -1,14 +1,16 @@
 buttons:
     start_button: |
-        📝 – INIZIA la tua candidatura
+        📝 - INIZIA la tua candidatura
     developer_button: |
-        🧑‍💻 – CONTATTA lo sviluppatore
+        🧑‍💻 - Sviluppatore
     cancel: |
-        ❌ – ANNULLA
+        ❌ - ANNULLA
     home: |
-        🏠 – Torna alla HOME
+        🏠 - Torna alla HOME
     start_work: |
-        ✅ – Sono SICURO
+        ✅ - Sono SICURO
+    source_button: |
+        📎 - Codice Sorgente
 
 types:
     moderator:

@@ -49,7 +49,8 @@ bot.api.config.use(parseMode('HTML'));
 
 const homeMenu = new Menu("home-menu")
     .submenu(buttons['start_button'], "chooser-menu", (ctx) => { ctx.editMessageText(messages['chooser']) }).row()
-    .url(buttons['developer_button'], "https://t.me/ProtocolSupport");
+    .url(buttons['developer_button'], "https://t.me/ProtocolSupport")
+    .url(buttons['source_button'], "https://github.com/ImOnlyFire/mtg24-bot/");
 const chooserMenu = new Menu("chooser-menu", { autoAnswer: false })
     .dynamic((ctx, range) => {
         Object.keys(types).forEach(key => {
