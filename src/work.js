@@ -79,7 +79,7 @@ async function sendAnswersToAdmin(conversation, ctx) {
             `\n\n--------------------------------\n\n`;
     });
 
-    const pasteJson = await new Pastee(answersStr, applicationKey, "text", `Provino di ${userName} - ${new Date().toLocaleDateString()}`, "main", true).createPaste();
+    const pasteJson = await new Pastee(answersStr, applicationKey, "text", `${userName} (${key}) application - ${new Date().toLocaleDateString()}`, "main", true).createPaste();
     const link = `https://paste.ee/r/${pasteJson['id']}`;
     const message = format(messages['new_application'], userId, userName, userId, link);
 
