@@ -81,6 +81,17 @@ messages:
         %s
 
         — <b>APRI IL LINK PER VEDERE LE RISPOSTE!</b>
+    accepted: |
+        ✅ | <b>STATO CANDIDATURA </b>
+
+        <i>»</i> Complimenti! La tua <b>CANDIDATURA</b> è stata <b>ACCETTATA</b> dallo staff. Ho creato un link temporaneo per entrare 
+        nella nostra <b>CHAT</b>.
+
+        – <a href="%s">Clicca qui</a> per entrare
+
+        ⛔️ – <b>ATTENZIONE</b>
+        <i>»</i> <b>PUBBLICARE</b> o <b>CONDIVIDERE</b> il <b>LINK DI INVITO</b> è severamente <b>VIETATO</b> e farlo comporterà una sanzione 
+        all'interno del nostro gruppo pubblico.
     already_in_progress: |
         Sei gia' in un provino!
     already_sent: |
