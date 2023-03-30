@@ -80,6 +80,7 @@ export const cancelMenu = new Menu("cancel-menu", { autoAnswer: false })
         await ctx.conversation.exit('work');
         delete ctx.session.in_progress[ctx.from.id];
         ctx.reply(messages['work_cancelled'], { reply_markup: { remove_keyboard: true } });
+        // test
     });
 
 bot.use(cancelMenu);
