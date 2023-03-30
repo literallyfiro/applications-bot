@@ -20,12 +20,12 @@ export async function banCommand(ctx) {
         await ctx.reply("User is not registered.");
         return;
     }
-    if (banned["value"]["banned"]) {
+    if (banned["value"]['__d']["banned"]) {
         await ctx.reply("User is already banned.");
         return;
     }
 
     // Finally, ban the user
-    await sessions.updateOne({ key: id }, { $set: { "value.banned": true, "value.user_answers": {}, "value.accepted": false }});
+    await sessions.updateOne({ key: id }, { $set: { "value.__d.banned": true, "value.__d.user_answers": {}, "value.__d.accepted": false }});
     await ctx.reply("User banned successfully.");
 }

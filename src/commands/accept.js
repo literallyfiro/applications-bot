@@ -22,18 +22,18 @@ export async function acceptCommand(ctx) {
         await ctx.reply("User is not registered.");
         return;
     }
-    if (user["value"]["user_answers"] == {}) {
+    if (user["value"]['__d']["user_answers"] == {}) {
         await ctx.reply("User has not answered any questions yet.");
         return;
     }
-    if (user["value"]["banned"]) {
+    if (user["value"]['__d']["banned"]) {
         await ctx.reply("User is banned. You can't accept him.");
         return;
     }
 
 
     // Finally, accept the user and send him a message with the link to the staff group
-    await sessions.updateOne({ key: id }, { $set: { "value.user_answers": {}, "value.accepted": true }});
+    await sessions.updateOne({ key: id }, { $set: { "value.__d.user_answers": {}, "value.__d.accepted": true }});
 
     const chatInvite = await ctx.createChatInviteLink({chat_id: ctx.chat.id, member_limit: 1});
     const link = chatInvite.invite_link;

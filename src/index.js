@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 config();
 
-import { Bot, session } from "grammy";
+import { Bot, session, enhanceStorage } from "grammy";
 import { hydrateReply, parseMode } from "@grammyjs/parse-mode";
 import { limit } from "@grammyjs/ratelimiter";
 import { conversations, createConversation } from "@grammyjs/conversations";
@@ -11,12 +11,11 @@ import { homeMenu, cancelMenu, createChooserMenu } from './menus.js';
 import { messages } from "./config.js";
 import { work } from './work.js';
 import { handleError } from './errorhandler.js';
-import { MongoClient, ServerApiVersion  } from "mongodb";
+import { MongoClient, ServerApiVersion } from "mongodb";
 
 import { banCommand } from './commands/ban.js';
 import { unbanCommand } from './commands/unban.js';
 import { acceptCommand } from './commands/accept.js';
-
 
 async function connectMongo() {
     const username = encodeURIComponent(process.env.MONGODB_USER);
@@ -47,7 +46,13 @@ async function bootstrap() {
                 accepted: false,
             }
         },
-        storage: new MongoDBAdapter({ collection: sessions }),
+        storage: enhanceStorage({
+            storage: new MongoDBAdapter({ collection: sessions }),
+            // migrations: {
+            //     // new migrations go here
+            //     1: first,
+            // },
+        }),
     }));
 
     // Error handling
@@ -71,7 +76,7 @@ async function bootstrap() {
     bot.command("unban", (ctx) => unbanCommand(ctx));
     bot.command("accept", (ctx) => acceptCommand(ctx));
     bot.on(["msg", "callback_query", "inline_query"], async (ctx) => {
-        if (ctx.session.in_progress != undefined) 
+        if (ctx.session.in_progress != undefined)
             return;
         delete ctx.session.conversation;
     });
