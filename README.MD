@@ -2,10 +2,10 @@
 # Applications-Bot
 A new and simple way to create your own bot for applications: completely modular and easy to use!
 
-### Authors
+## Authors
 - [@ImOnlyFire](https://github.com/ImOnlyFire)
 
-### How To Run Locally
+## How To Run Locally
 - Clone the project
 ```bash
   git clone https://github.com/ImOnlyFire/applications-bot.git
@@ -31,7 +31,7 @@ A new and simple way to create your own bot for applications: completely modular
   node ./dist
 ```
 
-### How To Run With Docker
+## How To Run With Docker
 - Clone the project
 ```bash
   git clone https://github.com/ImOnlyFire/applications-bot.git
@@ -53,7 +53,7 @@ A new and simple way to create your own bot for applications: completely modular
   docker compose up
 ```
 
-### Environment Variables
+## Environment Variables
 To succesfully run the project, you'll need to compile your new env with the correct infos!
 
 `BOT_TOKEN` for the Telegram bot token
