@@ -1,25 +1,9 @@
 import { sessions } from '../index.js';
 import { messages } from '../config.js';
-import { checkGroupAndAdmin } from './check/admin.js';
 import { format } from "util";
 
 export async function acceptCommand(ctx) {
-    // Check if user is admin and command is sent in admin group
-    if (!checkGroupAndAdmin(ctx)) {
-        return;
-    }
-
     const id = ctx.match;
-    if (id.length == 0 || ctx.message.text.split(" ").length > 2) {
-        await ctx.reply("Please provide a valid user id. Correct usage: <code>/accept [user id]</code>");
-        return;
-    }
-    // check if id is a number
-    if (isNaN(id)) {
-        await ctx.reply("Please provide a valid user id. Correct usage: <code>/accept [user id]</code>");
-        return;
-    }
-
     // Check if user is registered and has answered any questions yet (and is not banned)
     const user = await sessions.findOne({ key: id });
     if (user == null) {

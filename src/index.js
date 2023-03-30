@@ -12,10 +12,10 @@ import { messages } from "./config.js";
 import { work } from './work.js';
 import { handleError } from './errorhandler.js';
 import { MongoClient, ServerApiVersion } from "mongodb";
-
 import { banCommand } from './commands/ban.js';
 import { unbanCommand } from './commands/unban.js';
 import { acceptCommand } from './commands/accept.js';
+
 
 async function connectMongo() {
     const username = encodeURIComponent(process.env.MONGODB_USER);
@@ -91,7 +91,32 @@ async function bootstrap() {
 
     // All group stuff
     var groupActions = () => {
-        const groupTypes = bot.chatType(["group", "supergroup"]);
+        const adminGroupId = process.env.ADMIN_GROUP_ID;
+        const groupTypes = bot.chatType(["group", "supergroup"])
+            .filter((ctx) => {
+                const command = ctx.message.text.split(" ");
+                return command == "/ban" || command == "/unban" || command == "/accept"
+            })
+            .filter(async (ctx) => {
+                const user = await ctx.getAuthor();
+                return user.status === "creator" || user.status === "administrator";
+            })
+            .filter((ctx) => ctx.chat.id == adminGroupId)
+            .filter((ctx) => {
+                const command = ctx.message.text.split(" ");
+                // check if id is provided
+                if (command.length == 0 || command.length > 2) {
+                    ctx.reply("Please provide a valid user id to " + command[0] + ". Correct usage: <code>" + command[0] + " [user id]</code>");
+                    return false;
+                }
+                // check if id is a number
+                if (isNaN(command[1])) {
+                    ctx.reply("Please provide a valid user id. Correct usage: <code>" + command[0] + " [user id]</code>");
+                    return false;
+                }
+                return true;
+            });
+
         groupTypes.command("ban", (ctx) => banCommand(ctx));
         groupTypes.command("unban", (ctx) => unbanCommand(ctx));
         groupTypes.command("accept", (ctx) => acceptCommand(ctx));
