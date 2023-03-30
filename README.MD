@@ -28,7 +28,7 @@ A new and simple way to create your own bot for applications: completely modular
 ```
 - Run the Project
 ```bash
-  node ./dist
+  node .
 ```
 
 ## How To Run With Docker
@@ -50,7 +50,7 @@ A new and simple way to create your own bot for applications: completely modular
 ``` 
 - Run in Docker
 ```bash
-  docker compose up
+  docker-compose up
 ```
 
 ## Environment Variables
