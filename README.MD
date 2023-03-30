@@ -56,12 +56,18 @@ A new and simple way to create your own bot for applications: completely modular
 ## Environment Variables
 To succesfully run the project, you'll need to compile your new env with the correct infos!
 
-`BOT_TOKEN` for the Telegram bot token
+`BOT_TOKEN` - Telegram bot token
 
-`MONGODB_USER` for the username of the MongoDB user
+`MONGODB_USER` - MongoDB username
 
-`MONGODB_PASSWORD` for the password of the MongoDB user
+`MONGODB_PASSWORD` - MongoDB password
 
-`MONGODB_URL` for the URL of the MongoDB Database
+`MONGODB_URI` - MongoDB actual URI
+
+`PASTEE_KEY` Pastee developer key (Create an account on https://paste.ee/)
+
+`LOG_GROUP_ID` - Chat ID used for sending new applications
+
+`ADMIN_GROUP_ID` - Chat ID used for the admin commands
 
 <b>This ReadMe was made by [Repressoh](https://github.com/Repressoh) with love and a slice of pizza ;)
