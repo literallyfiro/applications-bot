@@ -70,15 +70,10 @@ async function bootstrap() {
         const privateTypes = bot.chatType("private")
         // Banned users can't do anything in private, so we filter them out
         privateTypes.filter((ctx) => ctx.session.banned).on(["msg:text", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
-            if (ctx.session.in_progress != undefined)
-                return;
-            delete ctx.session.conversation;
-
-            if (ctx.session.banned) {
-                console.log("User " + ctx.from.id + " is banned. Ignoring message.");
-                ctx.reply("You are banned. You can't use this bot.");
-            }
+            console.log("User " + ctx.from.id + " is banned. Ignoring message.");
+            ctx.reply("You are banned. You can't use this bot.");
         });
+        
         // Custom menus and conversations
         privateTypes.use(cancelMenu);
         privateTypes.use(createConversation(work));
@@ -86,6 +81,12 @@ async function bootstrap() {
         privateTypes.use(createChooserMenu());
         // Commands
         privateTypes.command("start", async (ctx) => await ctx.reply(messages.start, { reply_markup: homeMenu }));
+
+        privateTypes.on(["msg:text", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
+            if (ctx.session.in_progress != undefined)
+                return;
+            delete ctx.session.conversation;
+        });
     };
 
 
@@ -94,7 +95,7 @@ async function bootstrap() {
         const adminGroupId = process.env.ADMIN_GROUP_ID;
         const groupTypes = bot.chatType(["group", "supergroup"])
             .filter((ctx) => {
-                const command = ctx.message.text.split(" ");
+                const command = ctx.message.text.split(" ")[0];
                 return command == "/ban" || command == "/unban" || command == "/accept"
             })
             .filter(async (ctx) => {
@@ -105,8 +106,8 @@ async function bootstrap() {
             .filter((ctx) => {
                 const command = ctx.message.text.split(" ");
                 // check if id is provided
-                if (command.length == 0 || command.length > 2) {
-                    ctx.reply("Please provide a valid user id to " + command[0] + ". Correct usage: <code>" + command[0] + " [user id]</code>");
+                if (command.length != 2) {
+                    ctx.reply("Please provide a valid user id to " + command[0].replace('/', '') + ". Correct usage: <code>" + command[0] + " [user id]</code>");
                     return false;
                 }
                 // check if id is a number

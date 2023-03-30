@@ -10,7 +10,11 @@ export async function acceptCommand(ctx) {
         await ctx.reply("User is not registered.");
         return;
     }
-    if (user["value"]['__d']["user_answers"] == {}) {
+    if (user["value"]['__d']["accepted"]) {
+        await ctx.reply("User is already accepted.");
+        return;
+    }
+    if (Object.keys(user["value"]['__d']["user_answers"]).length == 0) {
         await ctx.reply("User has not answered any questions yet.");
         return;
     }
@@ -26,7 +30,7 @@ export async function acceptCommand(ctx) {
     const chatInvite = await ctx.createChatInviteLink({chat_id: ctx.chat.id, member_limit: 1});
     const link = chatInvite.invite_link;
     const message = format(messages['accepted'], link);
-    await ctx.api.sendMessage(id, message, { link_preview: false });
+    await ctx.api.sendMessage(id, message, { disable_web_page_preview: true });
 
     await ctx.reply("User accepted successfully.");
 }
