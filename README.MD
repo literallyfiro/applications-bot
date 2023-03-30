@@ -1,11 +1,11 @@
 
 # Applications-Bot
 A new and simple way to create your own bot for applications: completely modular and easy to use!
-#
-## Authors
+
+### Authors
 - [@ImOnlyFire](https://github.com/ImOnlyFire)
-#
-## How To Run Locally
+
+### How To Run Locally
 - Clone the project
 ```bash
   git clone https://github.com/ImOnlyFire/applications-bot.git
@@ -30,8 +30,8 @@ A new and simple way to create your own bot for applications: completely modular
 ```bash
   node ./dist
 ```
-#
-## How To Run With Docker
+
+### How To Run With Docker
 - Clone the project
 ```bash
   git clone https://github.com/ImOnlyFire/applications-bot.git
@@ -52,8 +52,8 @@ A new and simple way to create your own bot for applications: completely modular
 ```bash
   docker compose up
 ```
-#
-## Environment Variables
+
+### Environment Variables
 To succesfully run the project, you'll need to compile your new env with the correct infos!
 
 `BOT_TOKEN` for the Telegram bot token
@@ -63,5 +63,5 @@ To succesfully run the project, you'll need to compile your new env with the cor
 `MONGODB_PASSWORD` for the password of the MongoDB user
 
 `MONGODB_URL` for the URL of the MongoDB Database
-# 
+
 <b>This ReadMe was made by [Repressoh](https://github.com/Repressoh) with love and a slice of pizza ;)
