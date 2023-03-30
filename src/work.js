@@ -1,5 +1,14 @@
 import { messages, types } from "./config.js";
 import { cancelMenu } from "./menus.js";
+import { Pastee } from "./pastee.js";
+import { format } from "util";
+
+import { config } from 'dotenv';
+config();
+
+const applicationKey = process.env.PASTEE_KEY;
+const logGroupId = process.env.LOG_GROUP_ID;
+
 
 export async function work(conversation, ctx) {
     const key = conversation.session.in_progress;
@@ -37,12 +46,15 @@ export async function work(conversation, ctx) {
                 break;
             }
             if (replyText == null) {
-                ctx.reply('Risposta non valida. Questa domanda accetta solo risposte di tipo ' + questionType)
+                ctx.reply(messages['answer_not_valid'].replace('{type}', questionType));
                 continue;
             }
             if ((replyText.length < questionMinLength) || (replyText.length > questionMaxLength)) {
-                ctx.reply('La risposta non e" valida. Questa domanda deve essere lunga almeno '
-                    + questionMinLength + ' caratteri e al massimo ' + questionMaxLength + ' caratteri. La tua risposta e" lunga ' + replyText.length + ' caratteri.')
+                const message = messages['invalid_length']
+                    .replace('{min}', questionMinLength)
+                    .replace('{max}', questionMaxLength)
+                    .replace('{length}', replyText.length);
+                ctx.reply(message);
                 continue;
             }
             answerIsValid = true;
@@ -53,6 +65,29 @@ export async function work(conversation, ctx) {
 
     }
 
+    await conversation.external(() => sendAnswersToAdmin(conversation, ctx));
     ctx.reply(messages['work_done']);
     delete conversation.session.in_progress;
+}
+
+async function sendAnswersToAdmin(conversation, ctx) {
+    const key = conversation.session.in_progress;
+    const userAnswers = conversation.session.user_answers;
+    const userId = ctx.from.id;
+    const userName = ctx.from.first_name;
+
+    let answersStr = "";
+    userAnswers[key].forEach((element, index) => {
+        const properQuestion = types[key]['questions'][++index];
+        const questionName = properQuestion['name'];
+        answersStr += `Domanda ${index + 1} - ${questionName} \n` +
+            `Risposta:${element}` +
+            `\n\n--------------------------------\n\n`;
+    });
+
+    const pasteJson = await new Pastee(answersStr, applicationKey, "text", `Provino di ${userName} - ${new Date().toLocaleDateString()}`, "main", true).createPaste();
+    const link = `https://paste.ee/r/${pasteJson['id']}`;
+    const message = format(messages['new_application'], userId, userName, userId, link);
+
+    await ctx.api.sendMessage(logGroupId, message, { link_preview: false });
 }

@@ -72,9 +72,24 @@ messages:
         <i>Se verrai accettato, te lo faremo sapere tramite questo bot.</i>
 
         <b>— Purtroppo non possiamo accettare tutti, ma non ti preoccupare, ci saranno altre opportunità in futuro</b>
+    new_application: |
+        🧾 <b>NUOVO PROVINO!</b>
+
+        🚹• <b>Utente</b>: <a href="tg://user?id=%s">%s</a> [<code>%s</code>]
+
+        ❓• <b>RISPOSTE</b>
+        %s
+
+        — <b>APRI IL LINK PER VEDERE LE RISPOSTE!</b>
     already_in_progress: |
         Sei gia' in un provino!
+    already_sent: |
+        Hai gia' inviato un provino precedentemente!
     work_cancelled: |
         Hai annullato la candidatura.
     not_in_progress: |
         Non sei in nessuna candidatura!
+    answer_not_valid: |
+        Risposta non valida. Questa domanda accetta solo risposte di tipo {type}
+    invalid_length: |
+        La risposta non è valida. Questa domanda deve essere lunga almeno {min} caratteri e al massimo {max} caratteri. La tua risposta ha {length} caratteri.

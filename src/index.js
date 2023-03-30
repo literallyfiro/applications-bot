@@ -61,6 +61,11 @@ async function bootstrap() {
 
     // Commands
     bot.command("start", (ctx) => ctx.reply(messages.start, { reply_markup: homeMenu }));
+    bot.on(["msg", "callback_query", "inline_query"], (ctx) => {
+        if (ctx.session.in_progress != undefined) 
+            return;
+        delete ctx.session.conversation;
+    });
 
     console.log("Waiting for updates...");
     bot.start();

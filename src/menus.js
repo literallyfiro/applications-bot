@@ -45,6 +45,10 @@ export function createChooserMenu() {
                     ctx.answerCallbackQuery({ text: messages['already_in_progress'], show_alert: true });
                     return;
                 }
+                if (Object.keys(ctx.session.user_answers).length !== 0) {
+                    ctx.answerCallbackQuery({ text: messages['already_sent'], show_alert: true });
+                    return;
+                }
                 ctx.session.in_progress = key;
                 await ctx.conversation.enter('work');
             })
