@@ -8,6 +8,10 @@ export async function unbanCommand(ctx) {
     }
 
     const id = ctx.match;
+    if (id.length == 0 || ctx.message.text.split(" ").length > 2) {
+        await ctx.reply("Please provide a valid user id to unban. Correct usage: <code>/unban [user id]</code>");
+        return;
+    }
     // check if id is a number
     if (isNaN(id)) {
         await ctx.reply("Please provide a valid user id to unban. Correct usage: <code>/unban [user id]</code>");

@@ -2,7 +2,7 @@ import { messages, buttons, types } from "./config.js";
 import { Menu } from "@grammyjs/menu";
 
 export const homeMenu = new Menu("home-menu")
-    .submenu(buttons['start_button'], "chooser-menu", (ctx) => { ctx.editMessageText(messages['chooser']) }).row()
+    .submenu(buttons['start_button'], "chooser-menu", (ctx) => ctx.editMessageText(messages['chooser'])).row()
     .url(buttons['developer_button'], "https://t.me/ProtocolSupport")
     .url(buttons['source_button'], "https://github.com/ImOnlyFire/mtg24-bot/");
 

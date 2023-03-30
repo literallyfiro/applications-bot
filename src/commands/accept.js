@@ -10,9 +10,13 @@ export async function acceptCommand(ctx) {
     }
 
     const id = ctx.match;
+    if (id.length == 0 || ctx.message.text.split(" ").length > 2) {
+        await ctx.reply("Please provide a valid user id. Correct usage: <code>/accept [user id]</code>");
+        return;
+    }
     // check if id is a number
     if (isNaN(id)) {
-        await ctx.reply("Please provide a valid user id to. Correct usage: <code>/accept [user id]</code>");
+        await ctx.reply("Please provide a valid user id. Correct usage: <code>/accept [user id]</code>");
         return;
     }
 

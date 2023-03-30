@@ -64,23 +64,46 @@ async function bootstrap() {
     bot.use(conversations());
     bot.use(generateUpdateMiddleware());
 
-    // Custom menus and conversations
-    bot.use(cancelMenu);
-    bot.use(createConversation(work));
-    bot.use(homeMenu);
-    bot.use(createChooserMenu());
 
-    // Commands
-    bot.command("start", async (ctx) => await ctx.reply(messages.start, { reply_markup: homeMenu }));
-    bot.command("ban", (ctx) => banCommand(ctx));
-    bot.command("unban", (ctx) => unbanCommand(ctx));
-    bot.command("accept", (ctx) => acceptCommand(ctx));
-    bot.on(["msg", "callback_query", "inline_query"], async (ctx) => {
-        if (ctx.session.in_progress != undefined)
-            return;
-        delete ctx.session.conversation;
-    });
+    // All private stuff
+    var privateActions = () => {
+        const privateTypes = bot.chatType("private")
+        // Banned users can't do anything in private, so we filter them out
+        privateTypes.filter((ctx) => ctx.session.banned).on(["msg:text", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
+            if (ctx.session.in_progress != undefined)
+                return;
+            delete ctx.session.conversation;
 
+            if (ctx.session.banned) {
+                console.log("User " + ctx.from.id + " is banned. Ignoring message.");
+                ctx.reply("You are banned. You can't use this bot.");
+            }
+        });
+        // Custom menus and conversations
+        privateTypes.use(cancelMenu);
+        privateTypes.use(createConversation(work));
+        privateTypes.use(homeMenu);
+        privateTypes.use(createChooserMenu());
+        // Commands
+        privateTypes.command("start", async (ctx) => await ctx.reply(messages.start, { reply_markup: homeMenu }));
+    };
+
+
+    // All group stuff
+    var groupActions = () => {
+        const groupTypes = bot.chatType(["group", "supergroup"]);
+        groupTypes.command("ban", (ctx) => banCommand(ctx));
+        groupTypes.command("unban", (ctx) => unbanCommand(ctx));
+        groupTypes.command("accept", (ctx) => acceptCommand(ctx));
+    };
+
+
+    // Call all functions
+    privateActions();
+    groupActions();
+
+
+    // Start bot
     console.log("Waiting for updates...");
     bot.start();
 }
