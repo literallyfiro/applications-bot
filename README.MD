@@ -2,9 +2,6 @@
 # Applications-Bot
 A new and simple way to create your own bot for applications: completely modular and easy to use!
 
-## Authors
-- [@ImOnlyFire](https://github.com/ImOnlyFire)
-
 ## How To Run Locally
 - Clone the project
 ```bash
