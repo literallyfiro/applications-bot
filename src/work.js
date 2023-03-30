@@ -12,13 +12,7 @@ const logGroupId = process.env.LOG_GROUP_ID;
 
 export async function work(conversation, ctx) {
     const key = conversation.session.in_progress;
-    const questionSize = Object.keys(types[key]['questions']).length;
     const answers = [];
-
-    if (questionSize === 0) {
-        ctx.reply('Questo tipo di candidatura non ha domande da rispondere.');
-        return;
-    }
 
     for (const questionKey in types[key]['questions']) {
         const questionData = types[key]['questions'][questionKey];

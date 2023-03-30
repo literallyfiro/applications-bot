@@ -64,6 +64,10 @@ async function bootstrap() {
     bot.use(conversations());
     bot.use(generateUpdateMiddleware());
 
+    bot.filter((ctx) => ctx.session.in_progress == undefined).filter((ctx) => ctx.session.conversation != undefined).fork((ctx) => {
+        console.log("Deleting conversation from session");
+        delete ctx.session.conversation;
+    });
 
     // All private stuff
     var privateActions = () => {
@@ -82,11 +86,11 @@ async function bootstrap() {
         // Commands
         privateTypes.command("start", async (ctx) => await ctx.reply(messages.start, { reply_markup: homeMenu }));
 
-        privateTypes.on(["msg:text", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
-            if (ctx.session.in_progress != undefined)
-                return;
-            delete ctx.session.conversation;
-        });
+        // privateTypes.on(["msg:text", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
+        //     if (ctx.session.in_progress != undefined)
+        //         return;
+        //     delete ctx.session.conversation;
+        // });
     };
 
 
