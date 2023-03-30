@@ -1,9 +1,6 @@
 
 # Applications-Bot
-A new and simple way to create your own bot for applications: completely modular and easy to use!
-
-## Authors
-- [@ImOnlyFire](https://github.com/ImOnlyFire)
+A new and simple way to create your own staff applications: completely modular and easy to use!
 
 ## How To Run Locally
 - Clone the project
