@@ -1,106 +1,123 @@
 buttons:
     start_button: |
-        📝 - INIZIA la tua candidatura
+        📝 - Apply
     developer_button: |
-        🧑‍💻 - Sviluppatore
+        🧑‍💻 - Developer
     cancel: |
-        ❌ - ANNULLA
+        ❌ - Cancel
     home: |
-        🏠 - Torna alla HOME
+        🏠 - Return to the home
     start_work: |
-        ✅ - Sono SICURO
+        ✅ - I'm sure
     source_button: |
-        📎 - Codice Sorgente
+        📎 - Source code
 
 types:
     moderator:
         name: |
-            🌟 – MODERATORE
+            Moderator
         description: |
-            Il moderatore è una figura importante per il gruppo, è colui che si occupa di controllare il gruppo e di risolvere eventuali problemi che si possono verificare.
+            The moderator is an important figure for the group, responsible for monitoring the group and resolving any issues that may arise.
         questions:
             # if required is false, the bot will say that the answer is optional and there will be a button to skip it
+            # Currently does not work
             1:
                 name: |
-                    » <b>Perché</b> vuoi candidarti per il ruolo di <b>MODERATORE</b>?
+                    » Why do you want to be part of our staff?
                 type: text
                 # required: true
                 min_length: 10
                 max_length: 1000
             2:
                 name: |
-                    » quanti anni hai
+                    » How old are you?
                 type: number
                 # required: true
+                min_length: -1
+                max_length: -1
+            3:
+                name: |
+                    » Do you like monkeys? Why?
+                type: text
+                # required: true
                 min_length: 0
-                max_length: 0 
+                max_length: 10000
     writer:
         name: |
-            📚 – SCRITTORE
+            Writer
         description: |
-            Lo scrittore e' utile.
+            You write stuff
+        questions: []
+    developer:
+        name: |
+            Developer
+        description: |
+            You code stuff and smash your head onto the keyboard.
         questions: []
 messages:
     start: |
-        🗳| <b>CANDIDATURE MINECRAFT-TG24</b>
-        » Benvenuto nel <b>BOT</b> di MinecraftTG24 in cui potrai svolgere la tua candidatura per diventare <b>MODERATORE</b> del <b>GRUPPO</b>.
+        <b>Welcome to the Staff Application Bot!</b>
 
-        🤖 – Il nostro <b>BOT</b> ti guiderà nello svolgimento della candidatura, ponendoti diverse domande che ci aiuteranno a capire le tue <b>MOTIVAZIONI</b> e le tue <b>ABILITA'</b> per diventare un moderatore.
+        Please choose an option:
+
+        • <b>Apply:</b> Start your staff application.
+        • <b>Developer:</b> Contact us for bot-related questions or feedback.
+        • <b>Source Code:</b> View the source code for this bot.
+
+        If you have any questions or concerns, please let us know.
     chooser: |
-        🧊| <b>SCELTA DELLA CANDIDATURA</b>
+        <b>Please select the application you want to complete:</b>
 
-        Qui potrai scegliere il ruolo per il quale vuoi candidarti. Ricorda che puoi candidarti per un solo ruolo alla volta!
+        Click on the "ℹ" button next to an application to get more information.
 
-        Se vuoi avere più informazioni su un determinato ruolo, clicca sul pulsante ℹ che si trova accanto ad ogni ruolo!
+        Please select only one application to complete. Thank you!
     disclaimer: |
-        💡| <b>IMPORTANTE</b>
-        » Prima di iniziare la candidatura, ti consigliamo di leggere attentamente IL <b>REGOLAMENTO</b> del gruppo al seguente link: (https://t.me/MTG24Chat/822694).
+        <b>Disclaimer:</b> We take staff applications seriously. Any troll or meme applications will result in a permanent ban from this bot. Please only submit a staff application if you are serious about joining our team.
 
-        » Avrai a disposizione <b>7 MINUTI</b> per rispondere alle domande, quindi prenditi il tempo necessario per fornire la risposta più adeguata. Ricorda che una volta inviata la risposta, non sarà possibile modificarla!
+        If you are ready to begin your application, click the button below. If you are unsure or want to return to the home screen, click the "Return to Home" button.
 
-        👉| Per procedere con la <b>CANDIDATURA</b>, clicca sul pulsante sottostante.
-
-        🐠| Tieni presente che le candidature in forma di <b>TROLL</b> o <b>MEME</b> saranno punite con un <b>BAN PERMANENTE</b> dal bot e un <b>BAN TEMPORANEO</b> dal gruppo.
-    only_numbers_answer: |
-        <b>Questa domanda richiede un numero</b>
+        Good luck with your application!
     question_template: |
-        📑 | <b>DOMANDA N. {number}</b>
+        📑 | <b>Question no.{number}</b>
         {message}
-        ❌ –  Se desideri <b>ANNULLARE</b> il tuo provino, clicca il <b>BOTTONE</b> qui sotto.
+        ❌ – If you want to cancel your application, click the button below.
     work_done: |
-        ✅ <b>Grazie per aver completato la candidatura!</b>
-        <i>Se verrai accettato, te lo faremo sapere tramite questo bot.</i>
+        <b>Thank you for completing your staff application!</b>
 
-        <b>— Purtroppo non possiamo accettare tutti, ma non ti preoccupare, ci saranno altre opportunità in futuro</b>
+        We appreciate the time and effort you put into answering our questions.
+
+        Please understand that we receive many applications and cannot accept everyone, but we appreciate your interest in joining our team. We wish you the best of luck with your future endeavors.
+
+        Thank you again for your application!
     new_application: |
-        🧾 <b>NUOVO PROVINO!</b>
+        <b>New Staff Application!</b>
 
-        🚹• <b>Utente</b>: <a href="tg://user?id=%s">%s</a> [<code>%s</code>]
+        A new staff application has been submitted by <a href="tg://user?id=%s">%s</a> [<code>%s</code>]. Please click the link below to view the answers:
 
-        ❓• <b>RISPOSTE</b>
-        %s
-
-        — <b>APRI IL LINK PER VEDERE LE RISPOSTE!</b>
+        <a href=" %s">Click here to view answers</a>
     accepted: |
-        ✅ | <b>STATO CANDIDATURA </b>
+        <b>Congratulations!</b>
 
-        <i>»</i> Complimenti! La tua <b>CANDIDATURA</b> è stata <b>ACCETTATA</b> dallo staff. Ho creato un link temporaneo per entrare 
-        nella nostra <b>CHAT</b>.
+        We are pleased to inform you that your staff application has been accepted! You have been invited to join our staff Telegram group, where you will receive further instructions and get to know our team members.
 
-        – <a href="%s">Clicca qui</a> per entrare
+        Please join the group using the link below:
 
-        ⛔️ – <b>ATTENZIONE</b>
-        <i>»</i> <b>PUBBLICARE</b> o <b>CONDIVIDERE</b> il <b>LINK DI INVITO</b> è severamente <b>VIETATO</b> e farlo comporterà una sanzione 
-        all'interno del nostro gruppo pubblico.
+        <a href="%s">Join Our Staff Group</a>
+
+        Thank you for your interest in joining our team, and we look forward to working with you!
     already_in_progress: |
-        Sei gia' in un provino!
+        You are already doing a staff application!
     already_sent: |
         Hai gia' inviato un provino precedentemente!
     work_cancelled: |
-        Hai annullato la candidatura.
+        You have cancelled your application.
     not_in_progress: |
-        Non sei in nessuna candidatura!
+        You are in no staff application at the moment!
     answer_not_valid: |
-        Risposta non valida. Questa domanda accetta solo risposte di tipo {type}
+        Sorry, but the answer is not valid. This question accepts only '{type}' answers
     invalid_length: |
-        La risposta non è valida. Questa domanda deve essere lunga almeno {min} caratteri e al massimo {max} caratteri. La tua risposta ha {length} caratteri.
+        Sorry, this answer does not meet the current question criteria. Your answer needs to be at least {min} characters long and {max} maximum. Your answer has {length} characters
+    only_numbers_answer: |
+        <b>This question requires a number!</b>
+    work_with_no_question: |
+        This type of application has no questions to answer. Please come back later.
