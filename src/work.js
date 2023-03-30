@@ -1,9 +1,8 @@
 import { messages, types } from "./config.js";
-import { cancelMenu } from "./index.js";
+import { cancelMenu } from "./menus.js";
 
 export async function work(conversation, ctx) {
-    // await conversation.run(cancelMenu);
-    const key = ctx.session.in_progress;
+    const key = conversation.session.in_progress;
     const questionSize = Object.keys(types[key]['questions']).length;
     const answers = [];
 
@@ -33,6 +32,8 @@ export async function work(conversation, ctx) {
                     ctx.reply(messages['only_numbers_answer']);
                     continue;
                 }
+                answers.push(replyText);
+                conversation.session.user_answers[key] = answers;
                 break;
             }
             if (replyText == null) {
@@ -47,13 +48,11 @@ export async function work(conversation, ctx) {
             answerIsValid = true;
 
             answers.push(replyText);
-            ctx.session.user_answers[ctx.from.id] = answers;
+            conversation.session.user_answers[key] = answers;
         }
 
     }
 
     ctx.reply(messages['work_done']);
-    console.log(ctx.session.in_progress);
-    ctx.session.in_progress = key;
-    console.log(ctx.session.in_progress);
+    delete conversation.session.in_progress;
 }

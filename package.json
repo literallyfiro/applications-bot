@@ -1,9 +1,9 @@
 {
   "type": "module",
-  "name": "mtg24-bot",
+  "name": "applications-bot",
   "version": "1.0.0",
-  "description": "Bot provini",
-  "main": "index.js",
+  "description": "Staff applications bot",
+  "main": "src/index.js",
   "keywords": [],
   "author": "Firo",
   "license": "MIT",
@@ -13,9 +13,11 @@
     "@grammyjs/parse-mode": "^1.6.0",
     "@grammyjs/ratelimiter": "^1.1.6",
     "@grammyjs/storage-file": "^2.1.4",
+    "@grammyjs/storage-mongodb": "^2.1.4",
     "dotenv": "^16.0.3",
     "grammy": "^1.15.3",
     "js-yaml": "^4.1.0",
+    "mongodb": "^5.1.0",
     "telegraf-middleware-console-time": "^2.1.0"
   }
 }
