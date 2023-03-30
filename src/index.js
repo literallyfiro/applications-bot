@@ -33,7 +33,7 @@ async function bootstrap() {
     bot.api.config.use(parseMode('HTML'));
 
     const mongoClient = await connectMongo();
-    const db = mongoClient.db('mtg24');
+    const db = mongoClient.db('applications-bot');
     sessions = db.collection('sessions');
 
     // Session management
