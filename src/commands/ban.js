@@ -14,6 +14,6 @@ export async function banCommand(ctx) {
     }
 
     // Finally, ban the user
-    await sessions.updateOne({ key: id }, { $set: { "value.__d.banned": true, "value.__d.user_answers": {}, "value.__d.accepted": false }});
+    await sessions.updateOne({ key: id }, { $set: { "value.__d.banned": true, "value.__d.user_answers": {}, "value.__d.accepted": false } });
     await ctx.reply("User banned successfully.");
 }
