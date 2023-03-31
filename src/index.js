@@ -64,20 +64,25 @@ async function bootstrap() {
     bot.use(conversations());
     bot.use(generateUpdateMiddleware());
 
-    bot.filter((ctx) => ctx.session.in_progress == undefined).filter((ctx) => ctx.session.conversation != undefined).fork((ctx) => {
-        console.log("Deleting conversation from session");
-        delete ctx.session.conversation;
-    });
+    bot
+        .filter((ctx) => ctx.session.in_progress == undefined)
+        .filter((ctx) => ctx.session.conversation != undefined)
+        .fork((ctx) => {
+            console.log("Deleting conversation from session");
+            delete ctx.session.conversation;
+        });
 
     // All private stuff
     var privateActions = () => {
         const privateTypes = bot.chatType("private")
         // Banned users can't do anything in private, so we filter them out
-        privateTypes.filter((ctx) => ctx.session.banned).on(["msg:text", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
-            console.log("User " + ctx.from.id + " is banned. Ignoring message.");
-            ctx.reply("You are banned. You can't use this bot.");
-        });
-        
+        privateTypes
+            .filter((ctx) => ctx.session.banned)
+            .on(["msg", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
+                console.log("User " + ctx.from.id + " is banned. Ignoring message.");
+                ctx.reply("You are banned. You can't use this bot.");
+            });
+
         // Custom menus and conversations
         privateTypes.use(cancelMenu);
         privateTypes.use(createConversation(work));
@@ -85,12 +90,6 @@ async function bootstrap() {
         privateTypes.use(createChooserMenu());
         // Commands
         privateTypes.command("start", async (ctx) => await ctx.reply(messages.start, { reply_markup: homeMenu }));
-
-        // privateTypes.on(["msg:text", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
-        //     if (ctx.session.in_progress != undefined)
-        //         return;
-        //     delete ctx.session.conversation;
-        // });
     };
 
 
