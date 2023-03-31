@@ -66,7 +66,7 @@ async function bootstrap() {
 
     bot
         .filter((ctx) => ctx.session.in_progress == undefined)
-        .filter((ctx) => ctx.session.conversation != undefined)
+        .filter((ctx) => ctx.session.conversation === null)
         .fork((ctx) => {
             console.log("Deleting conversation from session");
             delete ctx.session.conversation;
