@@ -1,12 +1,13 @@
-import { messages, buttons, types } from "./config.js";
+import { messages, buttons, types } from "./config";
 import { Menu } from "@grammyjs/menu";
+import { BotContext } from "./index";
 
-export const homeMenu = new Menu("home-menu")
+export const homeMenu = new Menu<BotContext>("home-menu")
     .submenu(buttons['start_button'], "chooser-menu", async (ctx) => await ctx.editMessageText(messages['chooser'])).row()
     .url(buttons['developer_button'], "https://t.me/ProtocolSupport")
     .url(buttons['source_button'], "https://github.com/ImOnlyFire/mtg24-bot/");
 
-export const cancelMenu = new Menu("cancel-menu", { autoAnswer: false })
+export const cancelMenu = new Menu<BotContext>("cancel-menu", { autoAnswer: false })
     .text(buttons['cancel'], async (ctx) => {
         if (ctx.session.in_progress == undefined) {
             await ctx.answerCallbackQuery({ text: messages['not_in_progress'], show_alert: true });
@@ -19,7 +20,7 @@ export const cancelMenu = new Menu("cancel-menu", { autoAnswer: false })
     });
 
 export function createChooserMenu() {
-    const chooserMenu = new Menu("chooser-menu", { autoAnswer: false })
+    const chooserMenu = new Menu<BotContext>("chooser-menu", { autoAnswer: false })
         .dynamic((ctx, range) => {
             Object.keys(types).forEach(key => {
                 range
@@ -39,7 +40,7 @@ export function createChooserMenu() {
             ctx.editMessageText(messages['start'])
         });
     Object.keys(types).forEach(key => {
-        const disclaimerMenu = new Menu('disclaimer:' + key, { autoAnswer: false })
+        const disclaimerMenu = new Menu<BotContext>('disclaimer:' + key, { autoAnswer: false })
             .text(buttons['start_work'], async (ctx) => {
                 if (ctx.session.in_progress != undefined) {
                     await ctx.answerCallbackQuery({ text: messages['already_in_progress'], show_alert: true });

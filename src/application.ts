@@ -1,27 +1,31 @@
-import { messages, types } from "./config.js";
+import { messages, types } from "./config";
 import { cancelMenu } from "./menus.js";
-import { Pastee } from "./pastee.js";
+import { Pastee } from "./pastee";
 import { format } from "util";
 
 import { config } from 'dotenv';
+import { Conversation } from "@grammyjs/conversations";
+import { BotContext } from "./index.js";
 config();
 
-const applicationKey = process.env.PASTEE_KEY;
-const logGroupId = process.env.LOG_GROUP_ID;
+const applicationKey = process.env.PASTEE_KEY!;
+const logGroupId: number = parseInt(process.env.LOG_GROUP_ID!);
 
 
-export async function work(conversation, ctx) {
-    const key = conversation.session.in_progress;
-    const answers = [];
+export async function work(conversation: Conversation<BotContext>, ctx: BotContext) {
+    const key = conversation.session.in_progress!;
+    const answers: string[] = [];
+    const questions = types[key]['questions'];
 
-    for (const questionKey in types[key]['questions']) {
-        const questionData = types[key]['questions'][questionKey];
+    for (const questionKey in questions) {
+        const questionData = questions[questionKey];
+
         const questionName = questionData['name'];
         const questionType = questionData['type'];
         // const questionRequired = questionData['required'];
         const questionMinLength = questionData['min_length'];
         const questionMaxLength = questionData['max_length'];
-        const currentQuestion = Object.keys(types[key]['questions']).indexOf(questionKey) + 1;
+        const currentQuestion = (Object.keys(questions).indexOf(questionKey) + 1).toString();
 
         const questionMessage = (messages['question_template']).replace('{message}', questionName).replace('{number}', currentQuestion);
 
@@ -29,9 +33,16 @@ export async function work(conversation, ctx) {
         while (!answerIsValid) {
             ctx.reply(questionMessage, { reply_markup: cancelMenu });
             const reply = await conversation.waitFor(':text');
-            const replyText = reply.message?.text;
+
+            if (reply == null) {
+                // This technically should never happen, but just in case
+                continue;
+            }
+
+            const replyText = reply.message?.text!;
             if (questionType === 'number') {
-                if (isNaN(replyText)) {
+                let numberReply: number = parseInt(replyText);
+                if (isNaN(numberReply)) {
                     ctx.reply(messages['only_numbers_answer']);
                     continue;
                 }
@@ -45,9 +56,9 @@ export async function work(conversation, ctx) {
             }
             if ((replyText.length < questionMinLength) || (replyText.length > questionMaxLength)) {
                 const message = messages['invalid_length']
-                    .replace('{min}', questionMinLength)
-                    .replace('{max}', questionMaxLength)
-                    .replace('{length}', replyText.length);
+                    .replace('{min}', questionMinLength.toString())
+                    .replace('{max}', questionMaxLength.toString())
+                    .replace('{length}', replyText.length.toString());
                 ctx.reply(message);
                 continue;
             }
@@ -61,14 +72,15 @@ export async function work(conversation, ctx) {
 
     await conversation.external(() => sendAnswersToAdmin(conversation, ctx));
     ctx.reply(messages['work_done']);
-    delete conversation.session.in_progress;
+    conversation.session.in_progress = undefined;
+    return;
 }
 
-async function sendAnswersToAdmin(conversation, ctx) {
-    const key = conversation.session.in_progress;
+async function sendAnswersToAdmin(conversation: Conversation<BotContext>, ctx: BotContext) {
+    const key = conversation.session.in_progress!;
     const userAnswers = conversation.session.user_answers;
-    const userId = ctx.from.id;
-    const userName = ctx.from.first_name;
+    const userId = ctx.from?.id;
+    const userName = ctx.from?.first_name;
 
     let answersStr = "";
     userAnswers[key].forEach((element, index) => {
@@ -83,5 +95,5 @@ async function sendAnswersToAdmin(conversation, ctx) {
     const link = `https://paste.ee/r/${pasteJson['id']}`;
     const message = format(messages['new_application'], userId, userName, userId, link);
 
-    await ctx.api.sendMessage(logGroupId, message, { link_preview: false });
+    await ctx.api.sendMessage(logGroupId, message, { disable_web_page_preview: true });
 }

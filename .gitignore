@@ -5,3 +5,5 @@ sessions/
 .idea/
 
 node_modules/
+
+dist/

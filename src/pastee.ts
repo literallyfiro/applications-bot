@@ -1,6 +1,13 @@
 export class Pastee {
+    contents: string;
+    applicationKey: string;
+    sectionLang: string;
+    description: string;
+    sectionName: string;
+    encrypted: boolean;
+    endpoint: string;
 
-    constructor(contents, applicationKey, sectionLang = "text", description = "", sectionName = "main", encrypted = false) {
+    constructor(contents: string, applicationKey: string, sectionLang = "text", description = "", sectionName = "main", encrypted = false) {
         this.contents = contents;
         this.applicationKey = applicationKey;
         this.sectionLang = sectionLang;

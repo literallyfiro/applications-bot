@@ -1,6 +1,6 @@
-import { GrammyError, HttpError } from "grammy";
+import { BotError, GrammyError, HttpError } from "grammy";
 
-export function handleError(err) {
+export function handleError(err: BotError) {
     const ctx = err.ctx;
     console.error(`Error while handling update ${ctx.update.update_id}:`);
     const e = err.error;
