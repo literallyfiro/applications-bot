@@ -10,11 +10,9 @@ import { MongoDBAdapter, ISession } from "@grammyjs/storage-mongodb";
 import { Collection, MongoClient, ServerApiVersion } from "mongodb";
 import { homeMenu, cancelMenu, createChooserMenu } from './menus';
 import { messages } from "./config";
-// import { work } from './work.js';
-// import { handleError } from './errorhandler.js';
-// import { banCommand } from './commands/ban.js';
-// import { unbanCommand } from './commands/unban.js';
-import { acceptCommand } from './commands/accept.js';
+import { banCommand } from './commands/ban';
+import { unbanCommand } from './commands/unban';
+import { acceptCommand } from './commands/accept';
 import { handleError } from './errorhandler';
 import { work } from './application';
 import { type SessionData } from './session';
@@ -143,8 +141,8 @@ async function bootstrap() {
                 return true;
             });
 
-        // groupTypes.command("ban", (ctx) => banCommand(ctx));
-        // groupTypes.command("unban", (ctx) => unbanCommand(ctx));
+        groupTypes.command("ban", (ctx) => banCommand(ctx));
+        groupTypes.command("unban", (ctx) => unbanCommand(ctx));
         groupTypes.command("accept", (ctx) => acceptCommand(ctx));
     };
 
