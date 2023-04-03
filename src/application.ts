@@ -93,8 +93,8 @@ async function sendAnswersToAdmin(conversation: Conversation<BotContext>, ctx: B
     userAnswers[key].forEach((element, index) => {
         const properQuestion = types[key]['questions'][++index];
         const questionName = properQuestion['name'];
-        answersStr += `Domanda ${index + 1} - ${questionName} \n` +
-            `Risposta:${element}` +
+        answersStr += `Question ${index + 1} - ${questionName} \n` +
+            `Answer:${element}` +
             `\n\n--------------------------------\n\n`;
     });
 
