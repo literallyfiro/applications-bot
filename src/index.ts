@@ -8,7 +8,7 @@ import { ConversationFlavor, conversations, createConversation } from "@grammyjs
 import { generateUpdateMiddleware } from 'telegraf-middleware-console-time';
 import { MongoDBAdapter, ISession } from "@grammyjs/storage-mongodb";
 import { Collection, MongoClient, ServerApiVersion } from "mongodb";
-import { homeMenu, cancelMenu, createChooserMenu, trainMenu } from './menus';
+import { homeMenu, cancelMenu, createChooserMenu, trainMenu, cancelTrainMenu } from './menus';
 import { messages, configuration } from "./config";
 import { banCommand } from './commands/ban';
 import { unbanCommand } from './commands/unban';
@@ -130,10 +130,11 @@ async function bootstrap() {
         const adminGroupId: number = parseInt(process.env.ADMIN_GROUP_ID!.toString());
         const groupTypes = bot.chatType(["group", "supergroup"]);
 
-        if (configuration.gibberish_detection) {
+        if (configuration['gibberish_detection']) {
+            groupTypes.use(cancelTrainMenu);
             groupTypes.use(createConversation<BotContext>(train));
             groupTypes.use(trainMenu);
-            groupTypes.command("train", async (ctx) => await ctx.reply(messages['train'], { reply_markup: trainMenu }));
+            groupTypes.command("train", async (ctx) => await ctx.reply(messages['train_menu'], { reply_markup: trainMenu }));
         }
 
         groupTypes.on("::bot_command")

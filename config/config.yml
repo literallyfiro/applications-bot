@@ -68,8 +68,6 @@ types:
             You code stuff and smash your head onto the keyboard.
         questions: []
 messages:
-    train: |
-        Here you can train your bot.
     start: |
         <b>Welcome to the Staff Application Bot!</b>
 
@@ -125,7 +123,7 @@ messages:
     already_in_progress: |
         You are already doing a staff application!
     already_sent: |
-        Hai gia' inviato un provino precedentemente!
+        You already did a staff application before!
     work_cancelled: |
         You have cancelled your application.
     not_in_progress: |
@@ -140,3 +138,33 @@ messages:
         This type of application has no questions to answer. Please come back later.
     error_while_working: |
         There was an error while sending your answers to the admins. Please try again later.
+    
+    # Training messages
+    train_menu: |
+        <b>Welcome to the train menu!</b>
+
+        1. Fetch Current Training Data: This option will allow you to retrieve the current training data in a JSON file format. You can use this data to examine the current state of the bot's knowledge and make any necessary changes.
+
+        2. Train Bot: This option will start the training process for the bot, allowing it to improve its language and conversation skills based on new data.
+
+        Please select the option you would like to proceed with.
+    training_first_phase: |
+        👋 To commence our training process, I require three files.
+
+        • Firstly, I need a substantial collection of diverse and legitimate words. It's preferable that the file is at least a few megabytes in size. However, please avoid selecting literature from science fiction and fantasy genres, as these often contain uncommon word formations. (🤔 For instance, the default model was trained using a Sherlock Holmes novel.)
+
+        • Secondly, I need a file with around 20 simple and straightforward phrases that are easy to comprehend and free of complex language or unusual word formations.
+
+        • Finally, I need a file filled with overtly bad words and gibberish. This file will assist our AI model in learning what constitutes gibberish text and how to recognize it. 🧐
+       
+        <b>Let's start with the first file. Just send me the text file containing the stuff I said in the first bullet point.</b>
+    training_second_phase: |
+        Seems good! Now please send the second file. 
+    training_final_phase: |
+        Good job! now please send the last file.
+    training_in_progress: |
+        ⏳ <b>Training...</b>
+    training_done: |
+        🎉 Training process has been completed!
+    training_cancelled: |
+        Training process has been cancelled.

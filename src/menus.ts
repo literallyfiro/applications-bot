@@ -15,7 +15,7 @@ export const cancelMenu = new Menu<BotContext>("cancel-menu", { autoAnswer: fals
             return;
         }
         await ctx.answerCallbackQuery();
-        await ctx.conversation.exit('work');
+        await ctx.conversation.exit();
         delete ctx.session.in_progress;
         await ctx.reply(messages['work_cancelled'], { reply_markup: { remove_keyboard: true } });
     });
@@ -76,4 +76,10 @@ export const trainMenu = new Menu<BotContext>("train-menu", { autoAnswer: false 
     }).row()
     .text(buttons['train_model'], async (ctx) => {
         await ctx.conversation.enter('train');
+    });
+export const cancelTrainMenu = new Menu<BotContext>("cancel-training-menu", { autoAnswer: false })
+    .text(buttons['cancel'], async (ctx) => {
+        await ctx.answerCallbackQuery();
+        await ctx.conversation.exit();
+        await ctx.reply(messages['training_cancelled'], { reply_markup: { remove_keyboard: true } });
     });
