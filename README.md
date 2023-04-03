@@ -3,11 +3,11 @@ A new and simple way to create your own staff applications: completely modular a
 
 #### Table of contents
 * Installation:
-	* [How to run locally (Without docker)](https://github.com/ImOnlyFire/applications-bot/edit/main/README.MD#how-to-run-locally-without-docker)
-	* [How to run locally (With docker)](https://github.com/ImOnlyFire/applications-bot/edit/main/README.MD#how-to-run-locally-with-docker)
+	* [How to run locally (Without docker)](https://github.com/ImOnlyFire/applications-bot/#how-to-run-locally-without-docker)
+	* [How to run locally (With docker)](https://github.com/ImOnlyFire/applications-bot/#how-to-run-locally-with-docker)
 * Configuration:
-	* [Environment Variables](https://github.com/ImOnlyFire/applications-bot/edit/main/README.MD#environment-variables)
-	* [Gibberish detection](https://github.com/ImOnlyFire/applications-bot/edit/main/README.MD#environment-variables)
+	* [Environment Variables](https://github.com/ImOnlyFire/applications-bot/#-environment-variables)
+	* [Gibberish detection](https://github.com/ImOnlyFire/applications-bot/#-gibberish-detection)
 
 
 
