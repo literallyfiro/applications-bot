@@ -151,11 +151,11 @@ messages:
     training_first_phase: |
         👋 To commence our training process, I require three files.
 
-        • Firstly, I need a substantial collection of diverse and legitimate words. It's preferable that the file is at least a few megabytes in size. However, please avoid selecting literature from science fiction and fantasy genres, as these often contain uncommon word formations. (🤔 For instance, the default model was trained using a Sherlock Holmes novel.)
+        • Firstly, I need a substantial collection of diverse and legitimate words. It's preferable that the file is at least a few megabytes in size. However, please avoid selecting literature from science fiction and fantasy genres, as these often contain uncommon word formations. (🤔 For instance, the default model was trained using a Sherlock Holmes novel.) <a href="https://raw.githubusercontent.com/ImOnlyFire/applications-bot/main/gibberish/defaults/good.txt">Example</a>
 
-        • Secondly, I need a file with around 20 simple and straightforward phrases that are easy to comprehend and free of complex language or unusual word formations.
+        • Secondly, I need a file with around 20 simple and straightforward phrases that are easy to comprehend and free of complex language or unusual word formations. <a href="https://raw.githubusercontent.com/ImOnlyFire/applications-bot/main/gibberish/defaults/goodsm.txt">Example</a>
 
-        • Finally, I need a file filled with overtly bad words and gibberish. This file will assist our AI model in learning what constitutes gibberish text and how to recognize it. 🧐
+        • Finally, I need a file filled with overtly bad words and gibberish. This file will assist our AI model in learning what constitutes gibberish text and how to recognize it. 🧐 <a href="https://raw.githubusercontent.com/ImOnlyFire/applications-bot/main/gibberish/defaults/bad.txt">Example</a>
        
         <b>Let's start with the first file. Just send me the text file containing the stuff I said in the first bullet point.</b>
     training_second_phase: |
