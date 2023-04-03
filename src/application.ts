@@ -13,6 +13,7 @@ const logGroupId: number = parseInt(process.env.LOG_GROUP_ID!);
 
 
 export async function work(conversation: Conversation<BotContext>, ctx: BotContext) {
+    const chatId = ctx.chat!.id;
     const key = conversation.session.in_progress!;
     const answers: string[] = [];
     const questions = types[key]['questions'];
@@ -31,7 +32,7 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
 
         let answerIsValid = false;
         while (!answerIsValid) {
-            ctx.reply(questionMessage, { reply_markup: cancelMenu });
+            await ctx.reply(questionMessage, { reply_markup: cancelMenu });
             const reply = await conversation.waitFor(':text');
 
             if (reply == null) {
@@ -43,7 +44,7 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
             if (questionType === 'number') {
                 let numberReply: number = parseInt(replyText);
                 if (isNaN(numberReply)) {
-                    ctx.reply(messages['only_numbers_answer']);
+                    await ctx.reply(messages['only_numbers_answer']);
                     continue;
                 }
                 answers.push(replyText);
@@ -51,7 +52,7 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
                 break;
             }
             if (replyText == null) {
-                ctx.reply(messages['answer_not_valid'].replace('{type}', questionType));
+                await ctx.reply(messages['answer_not_valid'].replace('{type}', questionType));
                 continue;
             }
             if ((replyText.length < questionMinLength) || (replyText.length > questionMaxLength)) {
@@ -59,7 +60,7 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
                     .replace('{min}', questionMinLength.toString())
                     .replace('{max}', questionMaxLength.toString())
                     .replace('{length}', replyText.length.toString());
-                ctx.reply(message);
+                    await ctx.reply(message);
                 continue;
             }
             answerIsValid = true;
@@ -70,8 +71,14 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
 
     }
 
-    await conversation.external(() => sendAnswersToAdmin(conversation, ctx));
-    ctx.reply(messages['work_done']);
+    const messageId = (await ctx.api.sendMessage(chatId, messages['sending_answers'])).message_id;
+    await conversation.external(async () => await sendAnswersToAdmin(conversation, ctx)).then(async () => {
+        await ctx.api.editMessageText(chatId, messageId, messages['work_done']);
+    }).catch(async (err) => {
+        await ctx.api.editMessageText(chatId, messageId, messages['error_while_working']);
+        console.error(err);
+    });
+    
     conversation.session.in_progress = undefined;
     return;
 }

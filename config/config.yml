@@ -94,7 +94,7 @@ messages:
 
         A new staff application has been submitted by <a href="tg://user?id=%s">%s</a> [<code>%s</code>]. Please click the link below to view the answers:
 
-        <a href=" %s">Click here to view answers</a>
+        <a href="%s">Click here to view answers</a>
     accepted: |
         <b>Congratulations!</b>
 
@@ -105,6 +105,8 @@ messages:
         <a href="%s">Join Our Staff Group</a>
 
         Thank you for your interest in joining our team, and we look forward to working with you!
+    sending_answers: |
+        ⏳ <b>Sending answers...</b>
     already_in_progress: |
         You are already doing a staff application!
     already_sent: |
@@ -121,3 +123,5 @@ messages:
         <b>This question requires a number!</b>
     work_with_no_question: |
         This type of application has no questions to answer. Please come back later.
+    error_while_working: |
+        There was an error while sending your answers to the admins. Please try again later.
