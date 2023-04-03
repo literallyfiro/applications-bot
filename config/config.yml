@@ -1,3 +1,12 @@
+configuration:
+    # Checks for gibberish in the user's answer. For example:
+    # 
+    # njdasndisasidasadii -> Will not pass
+    # I like monkeys -> Will pass
+    #
+    # By default it uses a pre-trained english matrix. If you want to enable this feature in another language, you will need to train the bot yourself!
+    gibberish_detection: true
+
 buttons:
     start_button: |
         📝 - Apply
@@ -11,6 +20,10 @@ buttons:
         ✅ - I'm sure
     source_button: |
         📎 - Source code
+    fetch_model: |
+        ⬇ - Get current model
+    train_model: |
+        ⬆ - Train new model
 
 types:
     moderator:
@@ -55,6 +68,8 @@ types:
             You code stuff and smash your head onto the keyboard.
         questions: []
 messages:
+    train: |
+        Here you can train your bot.
     start: |
         <b>Welcome to the Staff Application Bot!</b>
 

@@ -1,4 +1,7 @@
 export interface ConfigData {
+    configuration: {
+        [key: string]: any
+    };
     types: {
         [key: string]: {
             name: string,
@@ -30,3 +33,4 @@ const yaml = load(readFileSync(filepath, "utf8")) as ConfigData;
 export const types = yaml.types;
 export const buttons = yaml.buttons;
 export const messages = yaml.messages;
+export const configuration = yaml.configuration;

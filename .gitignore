@@ -7,3 +7,6 @@ sessions/
 node_modules/
 
 dist/
+
+gibberish/*
+!gibberish/defaults

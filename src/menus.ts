@@ -1,6 +1,7 @@
 import { messages, buttons, types } from "./config";
 import { Menu } from "@grammyjs/menu";
 import { BotContext } from "./index";
+import { InputFile } from "grammy";
 
 export const homeMenu = new Menu<BotContext>("home-menu")
     .submenu(buttons['start_button'], "chooser-menu", async (ctx) => await ctx.editMessageText(messages['chooser'])).row()
@@ -66,3 +67,13 @@ export function createChooserMenu() {
     homeMenu.register(chooserMenu);
     return chooserMenu;
 }
+
+
+// Train
+export const trainMenu = new Menu<BotContext>("train-menu", { autoAnswer: false })
+    .text(buttons['fetch_model'], async (ctx) => {
+        await ctx.replyWithDocument(new InputFile('gibberish/model.json'));
+    }).row()
+    .text(buttons['train_model'], async (ctx) => {
+        await ctx.conversation.enter('train');
+    });

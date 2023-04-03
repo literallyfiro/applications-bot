@@ -8,16 +8,22 @@ import { ConversationFlavor, conversations, createConversation } from "@grammyjs
 import { generateUpdateMiddleware } from 'telegraf-middleware-console-time';
 import { MongoDBAdapter, ISession } from "@grammyjs/storage-mongodb";
 import { Collection, MongoClient, ServerApiVersion } from "mongodb";
-import { homeMenu, cancelMenu, createChooserMenu } from './menus';
-import { messages } from "./config";
+import { homeMenu, cancelMenu, createChooserMenu, trainMenu } from './menus';
+import { messages, configuration } from "./config";
 import { banCommand } from './commands/ban';
 import { unbanCommand } from './commands/unban';
 import { acceptCommand } from './commands/accept';
 import { handleError } from './errorhandler';
-import { work } from './application';
+import { work } from './conversations/application';
+import { train } from './conversations/training';
 import { type SessionData } from './session';
+import fs from "fs";
+import { FileFlavor, hydrateFiles } from '@grammyjs/files';
 
-export type BotContext = Context & SessionFlavor<SessionData> & ConversationFlavor;
+
+export const gibberish = require("gibberish-detective")({useCache: false});
+
+export type BotContext = FileFlavor<Context> & SessionFlavor<SessionData> & ConversationFlavor;
 export let sessions: Collection<ISession>;
 
 
@@ -33,18 +39,28 @@ async function connectMongo(): Promise<MongoClient> {
 
 
 async function bootstrap() {
+    if (configuration.gibberish_detection) {
+        // Load gibberish model
+        loadGibberishModel();
+    }
+
     const bot = new Bot<ParseModeFlavor<BotContext>>(process.env.BOT_TOKEN!);
     bot.api.config.use(parseMode('HTML'));
+    bot.api.config.use(hydrateFiles(bot.token));
 
     const mongoClient = await connectMongo();
     const db = mongoClient.db('applications-bot');
     sessions = db.collection<ISession>('sessions');
 
-    // Stores data per chat (default).
+    // Session management (session key)
     function getSessionKey(ctx: Context): string | undefined {
         if (ctx.chat?.type === "private") {
             return ctx.from?.id.toString();
         } else {
+            const adminGroupId: number = parseInt(process.env.ADMIN_GROUP_ID!.toString());
+            if (ctx.chat?.id == adminGroupId) {
+                return ctx.from?.id.toString();
+            }
             return undefined;
         }
     }
@@ -81,7 +97,6 @@ async function bootstrap() {
     bot.use(generateUpdateMiddleware());
 
     bot
-        .filter((ctx) => ctx.chat?.type === "private")
         .filter((ctx) => ctx.session.in_progress == undefined)
         .filter((ctx) => ctx.session.conversation === null)
         .fork((ctx) => {
@@ -113,11 +128,18 @@ async function bootstrap() {
     // All group stuff
     var groupActions = () => {
         const adminGroupId: number = parseInt(process.env.ADMIN_GROUP_ID!.toString());
-        const groupTypes = bot.chatType(["group", "supergroup"])
-            .on("::bot_command")
+        const groupTypes = bot.chatType(["group", "supergroup"]);
+
+        if (configuration.gibberish_detection) {
+            groupTypes.use(createConversation<BotContext>(train));
+            groupTypes.use(trainMenu);
+            groupTypes.command("train", async (ctx) => await ctx.reply(messages['train'], { reply_markup: trainMenu }));
+        }
+
+        groupTypes.on("::bot_command")
             .filter((ctx) => {
-                const command = ctx.message.text?.split(" ")[0];
-                return command == "/ban" || command == "/unban" || command == "/accept"
+                const command = ctx.message!.text?.split(" ")[0];
+                return command == "/ban" || command == "/unban" || command == "/accept";
             })
             .filter(async (ctx) => {
                 const user = await ctx.getAuthor();
@@ -125,7 +147,7 @@ async function bootstrap() {
             })
             .filter((ctx) => ctx.chat.id === adminGroupId)
             .filter((ctx) => {
-                const text = ctx.message.text!;
+                const text = ctx.message!.text!;
                 const command: string[] = text.split(" ");
                 // check if id is provided
                 if (command.length != 2) {
@@ -140,7 +162,7 @@ async function bootstrap() {
                 }
                 return true;
             });
-
+        
         groupTypes.command("ban", (ctx) => banCommand(ctx));
         groupTypes.command("unban", (ctx) => unbanCommand(ctx));
         groupTypes.command("accept", (ctx) => acceptCommand(ctx));
@@ -155,6 +177,18 @@ async function bootstrap() {
     // Start bot
     console.log("Waiting for updates...");
     bot.start();
+}
+
+function loadGibberishModel() {
+    let learningModel;
+    if (fs.existsSync('gibberish/model.json')) {
+        console.log("Loading gibberish model...");
+        learningModel = fs.readFileSync('gibberish/model.json');
+    } else {
+        console.log("No gibberish model found. Using default model.");
+        learningModel = fs.readFileSync('gibberish/defaults/model.json');
+    }
+    gibberish.set("model", JSON.parse(learningModel.toString()));
 }
 
 
