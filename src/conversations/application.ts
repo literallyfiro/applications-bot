@@ -2,14 +2,13 @@ import { messages, types, configuration } from "../config";
 import { cancelMenu } from "../menus.js";
 import { Pastee } from "../pastee";
 import { format } from "util";
-import { config } from "dotenv";
 import { Conversation } from "@grammyjs/conversations";
 import { BotContext } from "../index.js";
 import { gibberish } from "../index.js";
-config();
 
-const applicationKey = process.env.PASTEE_KEY!;
-const logGroupId: number = parseInt(process.env.LOG_GROUP_ID!);
+
+const applicationKey = process.env.PASTEE_KEY;
+const logGroupId = process.env.LOG_GROUP_ID;
 
 
 export async function work(conversation: Conversation<BotContext>, ctx: BotContext) {

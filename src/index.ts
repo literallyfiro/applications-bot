@@ -1,12 +1,10 @@
-import { config } from 'dotenv';
-config();
-
+import fs from "fs";
 import { Bot, Context, session, SessionFlavor, enhanceStorage } from "grammy";
 import { ParseModeFlavor, hydrateReply, parseMode } from "@grammyjs/parse-mode";
 import { limit } from "@grammyjs/ratelimiter";
 import { ConversationFlavor, conversations, createConversation } from "@grammyjs/conversations";
-import { generateUpdateMiddleware } from 'telegraf-middleware-console-time';
 import { MongoDBAdapter, ISession } from "@grammyjs/storage-mongodb";
+import { generateUpdateMiddleware } from 'telegraf-middleware-console-time';
 import { Collection, MongoClient, ServerApiVersion } from "mongodb";
 import { homeMenu, cancelMenu, createChooserMenu, trainMenu, cancelTrainMenu } from './menus';
 import { messages, configuration } from "./config";
@@ -17,22 +15,20 @@ import { handleError } from './errorhandler';
 import { work } from './conversations/application';
 import { train } from './conversations/training';
 import { type SessionData } from './session';
-import fs from "fs";
-import { FileFlavor, hydrateFiles } from '@grammyjs/files';
 
 
 export const gibberish = require("gibberish-detective")({useCache: false});
 
-export type BotContext = FileFlavor<Context> & SessionFlavor<SessionData> & ConversationFlavor;
+export type BotContext = Context & SessionFlavor<SessionData> & ConversationFlavor;
 export let sessions: Collection<ISession>;
 
 
 async function connectMongo(): Promise<MongoClient> {
     console.log("Connecting to MongoDB...");
 
-    const username = encodeURIComponent(process.env.MONGODB_USER!);
-    const password = encodeURIComponent(process.env.MONGODB_PASSWORD!);
-    const uri = process.env.MONGODB_URI!.replace("<username>", username).replace("<password>", password);
+    const username = encodeURIComponent(process.env.MONGODB_USER);
+    const password = encodeURIComponent(process.env.MONGODB_PASSWORD);
+    const uri = process.env.MONGODB_URI.replace("<username>", username).replace("<password>", password);
 
     return await new MongoClient(uri, { serverApi: ServerApiVersion.v1 }).connect();
 }
@@ -44,9 +40,8 @@ async function bootstrap() {
         loadGibberishModel();
     }
 
-    const bot = new Bot<ParseModeFlavor<BotContext>>(process.env.BOT_TOKEN!);
+    const bot = new Bot<ParseModeFlavor<BotContext>>(process.env.BOT_TOKEN);
     bot.api.config.use(parseMode('HTML'));
-    bot.api.config.use(hydrateFiles(bot.token));
 
     const mongoClient = await connectMongo();
     const db = mongoClient.db('applications-bot');
@@ -57,8 +52,7 @@ async function bootstrap() {
         if (ctx.chat?.type === "private") {
             return ctx.from?.id.toString();
         } else {
-            const adminGroupId: number = parseInt(process.env.ADMIN_GROUP_ID!.toString());
-            if (ctx.chat?.id == adminGroupId) {
+            if (ctx.chat?.id == process.env.ADMIN_GROUP_ID) {
                 return ctx.from?.id.toString();
             }
             return undefined;
@@ -73,11 +67,11 @@ async function bootstrap() {
             accepted: false,
         }
     }
-    
+
     // Session management
     bot.use(session({
         getSessionKey: getSessionKey,
-        initial: initial, 
+        initial: initial,
         storage: enhanceStorage({
             storage: new MongoDBAdapter({ collection: sessions }),
             // migrations: {
@@ -105,7 +99,7 @@ async function bootstrap() {
         });
 
     // All private stuff
-    var privateActions = () => {
+    const privateActions = () => {
         const privateTypes = bot.chatType("private")
         // Banned users can't do anything in private, so we filter them out
         privateTypes
@@ -121,13 +115,12 @@ async function bootstrap() {
         privateTypes.use(homeMenu);
         privateTypes.use(createChooserMenu());
         // Commands
-        privateTypes.command("start", async (ctx) => await ctx.reply(messages['start'], { reply_markup: homeMenu }));
+        privateTypes.command("start", async (ctx) => await ctx.reply(messages['start'], {reply_markup: homeMenu}));
     };
 
 
     // All group stuff
-    var groupActions = () => {
-        const adminGroupId: number = parseInt(process.env.ADMIN_GROUP_ID!.toString());
+    const groupActions = () => {
         const groupTypes = bot.chatType(["group", "supergroup"]);
 
         if (configuration['gibberish_detection']) {
@@ -146,13 +139,13 @@ async function bootstrap() {
                 const user = await ctx.getAuthor();
                 return user.status === "creator" || user.status === "administrator";
             })
-            .filter((ctx) => ctx.chat.id === adminGroupId)
+            .filter((ctx) => ctx.chat?.id === process.env.ADMIN_GROUP_ID)
             .filter((ctx) => {
                 const text = ctx.message!.text!;
                 const command: string[] = text.split(" ");
                 // check if id is provided
                 if (command.length != 2) {
-                    ctx.reply("Please provide a valid user id to " + command[0].replace('/', '') + ". Correct usage: <code>" + command[0] + " [user id]</code>");
+                    ctx.reply(`Please provide a valid user id to ${command[0].replace('/', '')}. Correct usage: <code>${command[0]} [user id]</code>`);
                     return false;
                 }
                 // check if id is a number
@@ -163,7 +156,7 @@ async function bootstrap() {
                 }
                 return true;
             });
-        
+
         groupTypes.command("ban", (ctx) => banCommand(ctx));
         groupTypes.command("unban", (ctx) => unbanCommand(ctx));
         groupTypes.command("accept", (ctx) => acceptCommand(ctx));
@@ -177,7 +170,7 @@ async function bootstrap() {
 
     // Start bot
     console.log("Waiting for updates...");
-    bot.start();
+    await bot.start();
 }
 
 function loadGibberishModel() {
