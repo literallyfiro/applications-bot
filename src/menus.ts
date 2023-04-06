@@ -1,27 +1,27 @@
-import { messages, buttons, types } from "./config";
-import { Menu } from "@grammyjs/menu";
-import { BotContext } from "./index";
-import { InputFile } from "grammy";
+import {buttons, messages, types} from "./config";
+import {Menu} from "@grammyjs/menu";
+import {BotContext} from "./index";
+import {InputFile} from "grammy";
 
 export const homeMenu = new Menu<BotContext>("home-menu")
     .submenu(buttons['start_button'], "chooser-menu", async (ctx) => await ctx.editMessageText(messages['chooser'])).row()
     .url(buttons['developer_button'], "https://t.me/ProtocolSupport")
     .url(buttons['source_button'], "https://github.com/ImOnlyFire/mtg24-bot/");
 
-export const cancelMenu = new Menu<BotContext>("cancel-menu", { autoAnswer: false })
+export const cancelMenu = new Menu<BotContext>("cancel-menu", {autoAnswer: false})
     .text(buttons['cancel'], async (ctx) => {
         if (ctx.session.in_progress == undefined) {
-            await ctx.answerCallbackQuery({ text: messages['not_in_progress'], show_alert: true });
+            await ctx.answerCallbackQuery({text: messages['not_in_progress'], show_alert: true});
             return;
         }
         await ctx.answerCallbackQuery();
         await ctx.conversation.exit();
         delete ctx.session.in_progress;
-        await ctx.reply(messages['work_cancelled'], { reply_markup: { remove_keyboard: true } });
+        await ctx.reply(messages['work_cancelled'], {reply_markup: {remove_keyboard: true}});
     });
 
 export function createChooserMenu() {
-    const chooserMenu = new Menu<BotContext>("chooser-menu", { autoAnswer: false })
+    const chooserMenu = new Menu<BotContext>("chooser-menu", {autoAnswer: false})
         .dynamic((ctx, range) => {
             Object.keys(types).forEach(key => {
                 range
@@ -30,7 +30,10 @@ export function createChooserMenu() {
                         await ctx.editMessageText(messages['disclaimer'])
                     })
                     .text('ℹ', async (ctx) => {
-                        await ctx.answerCallbackQuery({ text: types[key]['description'].slice(0, 200), show_alert: true });
+                        await ctx.answerCallbackQuery({
+                            text: types[key]['description'].slice(0, 200),
+                            show_alert: true
+                        });
                     })
                     .row();
             })
@@ -41,19 +44,19 @@ export function createChooserMenu() {
             ctx.editMessageText(messages['start'])
         });
     Object.keys(types).forEach(key => {
-        const disclaimerMenu = new Menu<BotContext>('disclaimer:' + key, { autoAnswer: false })
+        const disclaimerMenu = new Menu<BotContext>('disclaimer:' + key, {autoAnswer: false})
             .text(buttons['start_work'], async (ctx) => {
                 if (ctx.session.in_progress != undefined) {
-                    await ctx.answerCallbackQuery({ text: messages['already_in_progress'], show_alert: true });
+                    await ctx.answerCallbackQuery({text: messages['already_in_progress'], show_alert: true});
                     return;
                 }
                 if (Object.keys(ctx.session.user_answers).length !== 0) {
-                    await ctx.answerCallbackQuery({ text: messages['already_sent'], show_alert: true });
+                    await ctx.answerCallbackQuery({text: messages['already_sent'], show_alert: true});
                     return;
                 }
                 const questionSize = Object.keys(types[key]['questions']).length;
                 if (questionSize === 0) {
-                    await ctx.answerCallbackQuery({ text: messages['work_with_no_question'], show_alert: true });
+                    await ctx.answerCallbackQuery({text: messages['work_with_no_question'], show_alert: true});
                     return;
                 }
                 await ctx.answerCallbackQuery();
@@ -61,7 +64,9 @@ export function createChooserMenu() {
                 await ctx.conversation.enter('work');
             })
             .row()
-            .submenu(buttons['home'], "home-menu", async (ctx) => { await ctx.editMessageText(messages['start']) });
+            .submenu(buttons['home'], "home-menu", async (ctx) => {
+                await ctx.editMessageText(messages['start'])
+            });
         chooserMenu.register(disclaimerMenu);
     });
     homeMenu.register(chooserMenu);
@@ -70,16 +75,16 @@ export function createChooserMenu() {
 
 
 // Train
-export const trainMenu = new Menu<BotContext>("train-menu", { autoAnswer: false })
+export const trainMenu = new Menu<BotContext>("train-menu", {autoAnswer: false})
     .text(buttons['fetch_model'], async (ctx) => {
         await ctx.replyWithDocument(new InputFile('gibberish/model.json'));
     }).row()
     .text(buttons['train_model'], async (ctx) => {
         await ctx.conversation.enter('train');
     });
-export const cancelTrainMenu = new Menu<BotContext>("cancel-training-menu", { autoAnswer: false })
+export const cancelTrainMenu = new Menu<BotContext>("cancel-training-menu", {autoAnswer: false})
     .text(buttons['cancel'], async (ctx) => {
         await ctx.answerCallbackQuery();
         await ctx.conversation.exit();
-        await ctx.reply(messages['training_cancelled'], { reply_markup: { remove_keyboard: true } });
+        await ctx.reply(messages['training_cancelled'], {reply_markup: {remove_keyboard: true}});
     });

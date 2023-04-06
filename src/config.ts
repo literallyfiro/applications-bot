@@ -24,8 +24,8 @@ export interface ConfigData {
     };
 }
 
-import { load } from "js-yaml";
-import { readFileSync } from "fs";
+import {load} from "js-yaml";
+import {readFileSync} from "fs";
 
 const filepath = "config/config.yml";
 const yaml = load(readFileSync(filepath, "utf8")) as ConfigData;

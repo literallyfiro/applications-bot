@@ -1,10 +1,9 @@
-import { messages, types, configuration } from "../config";
-import { cancelMenu } from "../menus.js";
-import { Pastee } from "../pastee";
-import { format } from "util";
-import { Conversation } from "@grammyjs/conversations";
-import { BotContext } from "../index.js";
-import { gibberish } from "../index.js";
+import {configuration, messages, types} from "../config";
+import {cancelMenu} from "../menus.js";
+import {Pastee} from "../pastee";
+import {format} from "util";
+import {Conversation} from "@grammyjs/conversations";
+import {BotContext, gibberish} from "../index.js";
 
 
 const applicationKey = process.env.PASTEE_KEY;
@@ -31,7 +30,7 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
 
         let answerIsValid = false;
         while (!answerIsValid) {
-            await ctx.reply(questionMessage, { reply_markup: cancelMenu });
+            await ctx.reply(questionMessage, {reply_markup: cancelMenu});
             const reply = await conversation.waitFor(':text');
 
             if (reply == null) {
@@ -63,7 +62,7 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
                     .replace('{min}', questionMinLength.toString())
                     .replace('{max}', questionMaxLength.toString())
                     .replace('{length}', replyText.length.toString());
-                    await ctx.reply(message);
+                await ctx.reply(message);
                 continue;
             }
             answerIsValid = true;
@@ -81,7 +80,7 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
         await ctx.api.editMessageText(chatId, messageId, messages['error_while_working']);
         console.error(err);
     });
-    
+
     conversation.session.in_progress = undefined;
     return;
 }
@@ -105,5 +104,5 @@ async function sendAnswersToAdmin(conversation: Conversation<BotContext>, ctx: B
     const link = `https://paste.ee/r/${pasteJson['id']}`;
     const message = format(messages['new_application'], userId, userName, userId, link);
 
-    await ctx.api.sendMessage(logGroupId, message, { disable_web_page_preview: true });
+    await ctx.api.sendMessage(logGroupId, message, {disable_web_page_preview: true});
 }

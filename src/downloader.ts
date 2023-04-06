@@ -1,8 +1,9 @@
-import { format } from "util";
+import {format, promisify} from "util";
 import fs from 'fs';
-import { promisify } from 'util';
+import {config} from 'dotenv';
+
 const writeFilePromise = promisify(fs.writeFile);
-import { config } from 'dotenv';
+
 config();
 
 export async function download(url_file_path: string, effective_file_path: string) {

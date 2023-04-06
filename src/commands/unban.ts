@@ -1,10 +1,10 @@
-import { BotContext, sessions } from '../index';
-import { TempData } from '../session';
+import {BotContext, sessions} from '../index';
+import {TempData} from '../session';
 
 export async function unbanCommand(ctx: BotContext) {
     const id: string = ctx.match?.toString()!;
 
-    await sessions.findOne({ key: id }).then(async (user) => {
+    await sessions.findOne({key: id}).then(async (user) => {
         if (user == null) {
             await ctx.reply("User is not registered.");
             return;
@@ -19,7 +19,12 @@ export async function unbanCommand(ctx: BotContext) {
             return;
         }
 
-        await sessions.updateOne({ key: id }, { $set: { "value.__d.banned": false, "value.__d.user_answers": {} } }).then(async () => {
+        await sessions.updateOne({key: id}, {
+            $set: {
+                "value.__d.banned": false,
+                "value.__d.user_answers": {}
+            }
+        }).then(async () => {
             await ctx.reply("User unbanned successfully.");
         });
     });

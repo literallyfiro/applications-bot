@@ -1,4 +1,4 @@
-import { BotError, GrammyError, HttpError } from "grammy";
+import {BotError, GrammyError, HttpError} from "grammy";
 
 export function handleError(err: BotError) {
     const ctx = err.ctx;

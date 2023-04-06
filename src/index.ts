@@ -1,20 +1,20 @@
 import fs from "fs";
-import { Bot, Context, session, SessionFlavor, enhanceStorage } from "grammy";
-import { ParseModeFlavor, hydrateReply, parseMode } from "@grammyjs/parse-mode";
-import { limit } from "@grammyjs/ratelimiter";
-import { ConversationFlavor, conversations, createConversation } from "@grammyjs/conversations";
-import { MongoDBAdapter, ISession } from "@grammyjs/storage-mongodb";
-import { generateUpdateMiddleware } from 'telegraf-middleware-console-time';
-import { Collection, MongoClient, ServerApiVersion } from "mongodb";
-import { homeMenu, cancelMenu, createChooserMenu, trainMenu, cancelTrainMenu } from './menus';
-import { messages, configuration } from "./config";
-import { banCommand } from './commands/ban';
-import { unbanCommand } from './commands/unban';
-import { acceptCommand } from './commands/accept';
-import { handleError } from './errorhandler';
-import { work } from './conversations/application';
-import { train } from './conversations/training';
-import { type SessionData } from './session';
+import {Bot, Context, enhanceStorage, session, SessionFlavor} from "grammy";
+import {hydrateReply, parseMode, ParseModeFlavor} from "@grammyjs/parse-mode";
+import {limit} from "@grammyjs/ratelimiter";
+import {ConversationFlavor, conversations, createConversation} from "@grammyjs/conversations";
+import {ISession, MongoDBAdapter} from "@grammyjs/storage-mongodb";
+import {generateUpdateMiddleware} from 'telegraf-middleware-console-time';
+import {Collection, MongoClient, ServerApiVersion} from "mongodb";
+import {cancelMenu, cancelTrainMenu, createChooserMenu, homeMenu, trainMenu} from './menus';
+import {configuration, messages} from "./config";
+import {banCommand} from './commands/ban';
+import {unbanCommand} from './commands/unban';
+import {acceptCommand} from './commands/accept';
+import {handleError} from './errorhandler';
+import {work} from './conversations/application';
+import {train} from './conversations/training';
+import {type SessionData} from './session';
 
 
 export const gibberish = require("gibberish-detective")({useCache: false});
@@ -30,7 +30,7 @@ async function connectMongo(): Promise<MongoClient> {
     const password = encodeURIComponent(process.env.MONGODB_PASSWORD);
     const uri = process.env.MONGODB_URI.replace("<username>", username).replace("<password>", password);
 
-    return await new MongoClient(uri, { serverApi: ServerApiVersion.v1 }).connect();
+    return await new MongoClient(uri, {serverApi: ServerApiVersion.v1}).connect();
 }
 
 
@@ -73,7 +73,7 @@ async function bootstrap() {
         getSessionKey: getSessionKey,
         initial: initial,
         storage: enhanceStorage({
-            storage: new MongoDBAdapter({ collection: sessions }),
+            storage: new MongoDBAdapter({collection: sessions}),
             // migrations: {
             //     // new migrations go here
             //     1: first,
@@ -127,7 +127,7 @@ async function bootstrap() {
             groupTypes.use(cancelTrainMenu);
             groupTypes.use(createConversation<BotContext>(train));
             groupTypes.use(trainMenu);
-            groupTypes.command("train", async (ctx) => await ctx.reply(messages['train_menu'], { reply_markup: trainMenu }));
+            groupTypes.command("train", async (ctx) => await ctx.reply(messages['train_menu'], {reply_markup: trainMenu}));
         }
 
         groupTypes.on("::bot_command")
@@ -184,7 +184,6 @@ function loadGibberishModel() {
     }
     gibberish.set("model", JSON.parse(learningModel.toString()));
 }
-
 
 
 bootstrap();
