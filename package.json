@@ -15,7 +15,7 @@
     "@types/js-yaml": "^4.0.5",
     "dotenv": "^16.0.3",
     "gibberish-detective": "^1.0.3",
-    "grammy": "^1.15.3",
+    "grammy": "^1.16.0",
     "js-yaml": "^4.1.0",
     "mongodb": "^5.2.0",
     "telegraf-middleware-console-time": "^2.1.0"
