@@ -1,16 +1,6 @@
 # Applications Bot
 A new and simple way to create your own staff applications: completely modular and easy to use! 
 
-#### Table of contents
-* Installation:
-	* [How to run locally (Without docker)](https://github.com/ImOnlyFire/applications-bot/#how-to-run-locally-without-docker)
-	* [How to run locally (With docker)](https://github.com/ImOnlyFire/applications-bot/#how-to-run-locally-with-docker)
-* Configuration:
-	* [Environment Variables](https://github.com/ImOnlyFire/applications-bot/#-environment-variables)
-	* [Gibberish detection](https://github.com/ImOnlyFire/applications-bot/#-gibberish-detection)
-
-
-
 # Installation
 ### How to run locally (Without docker)
 
