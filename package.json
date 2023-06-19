@@ -21,7 +21,7 @@
     "telegraf-middleware-console-time": "^2.1.0"
   },
   "devDependencies": {
-    "@types/node": "^20.2.5",
+    "@types/node": "^20.3.1",
     "typescript": "^5.1.3"
   }
 }
