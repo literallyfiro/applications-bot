@@ -25,12 +25,7 @@ export let sessions: Collection<ISession>;
 
 async function connectMongo(): Promise<MongoClient> {
     console.log("Connecting to MongoDB...");
-
-    const username = encodeURIComponent(process.env.MONGODB_USER);
-    const password = encodeURIComponent(process.env.MONGODB_PASSWORD);
-    const uri = process.env.MONGODB_URI.replace("<username>", username).replace("<password>", password);
-
-    return await new MongoClient(uri, {serverApi: ServerApiVersion.v1}).connect();
+    return await new MongoClient(process.env.MONGODB_URI, {serverApi: ServerApiVersion.v1}).connect();
 }
 
 
