@@ -9,15 +9,15 @@ configuration:
 
 buttons:
     start_button: |
-        📝 - Apply
+        📝 - Candidati
     developer_button: |
         🧑‍💻 - Developer
     cancel: |
-        ❌ - Cancel
+        ❌ - Cancella
     home: |
-        🏠 - Return to the home
+        🏠 - Torna alla home
     start_work: |
-        ✅ - I'm sure
+        ✅ - Sono sicuro
     source_button: |
         📎 - Source code
     fetch_model: |
@@ -26,9 +26,9 @@ buttons:
         ⬆ - Train new model
 
 types:
-    moderator:
+    researcher:
         name: |
-            Moderator
+            Info Researcher
         description: |
             The moderator is an important figure for the group, responsible for monitoring the group and resolving any issues that may arise.
         questions:
@@ -50,9 +50,9 @@ types:
                 max_length: -1
             3:
                 name: |
-                    » Do you like monkeys? Why?
+                    <i>»</i> Perché dovremmo <b>SCEGLIERE</b> proprio <b>TE</b>? Cosa ti rende un candidato <b>MIGLIORE</b> rispetto agli altri? Questa domanda ci aiuterà a capire perché dovremmo sceglierti rispetto agli altri candidati.
                 type: text
-                # required: true
+                required: true
                 min_length: 0
                 max_length: 10000
     writer:
@@ -60,7 +60,83 @@ types:
             Writer
         description: |
             You write stuff
-        questions: []
+        questions:
+            # if required is false, the bot will say that the answer is optional and there will be a button to skip it
+            # Currently does not 
+            1:
+                name: |
+                    <i>»</i> <b>ETA</b>': Quanti <b>ANNI</b> hai? Questa informazione ci aiuterà a conoscere meglio il candidato.
+                type: number
+                required: true
+                min_length: 10
+                max_length: 1000
+            2:
+                name: |
+                    <i>» </i>Quali sono le <b>motivazioni</b> che ti spingono a candidarti come <b>SCRITTORE</b> del <b>canale</b>?
+                    Vogliamo capire quali sono i tuoi obiettivi e motivazioni per entrare a far parte del team.
+                type: text
+                required: true
+                min_length: 10
+                max_length: 1000
+            3:
+                name: |
+                    <i>»</i> Quali sono le tue esperienze passate come <b>SCRITTORE</b>? Se non ne possiedi, procedi scrivendo <b>"nessuna"</b>.
+                type: text
+                required: true
+                min_length: 0
+                max_length: 10000
+            4:
+                name: |
+                    <i>»</i> Hai una specializzazione o un <b>interesse particolare in un determinato argomento</b>? o settore tematico?
+                    Alcuni dei settori che trattiamo sono: <i>News, Esclusive, Minecraft Live, Interviste e Curiosità</i>.
+                type: text
+                required: true
+                min_length: 0
+                max_length: 10000
+            5:
+                name: |
+                    <i>»</i> Come gestisci il <b>feedback e le critiche</b> sui tuoi scritti? Sei aperto a <b>ricevere suggerimenti e apportare modifiche</b>?
+                type: text
+                required: true
+                min_length: 0
+                max_length: 10000
+            6:
+                name: |
+                    <i>»</i> Come lavori in <b>team</b>? Hai <b>esperienze precedenti di collaborazione</b> con altri scrittori?
+                type: text
+                required: true
+                min_length: 0
+                max_length: 10000
+            7:
+                name: |
+                    <i>»</i> Come ti senti nel <b>rispettare scadenze</b> e lavorare su <b>progetti con limiti di tempo</b> definiti?
+                type: text
+                required: true
+                min_length: 0
+                max_length: 10000
+            8:
+                name: |
+                    <i>»</i> Come ti <b>organizzi nel processo di scrittura</b>? Hai uno <b>schema o una routine</b> specifica che segui?
+                type: text
+                required: true
+                min_length: 0
+                max_length: 10000
+            9:
+                name: |
+                    <i>»</i> Potresti <b>condividere uno o più esempi di post o articoli che hai scritto in passato</b>?
+                    Sarebbe fantastico avere <b>un'idea più concreta</b> del tuo <b>stile di scrittura</b>.
+                type: text
+                required: true
+                min_length: 0
+                max_length: 10000
+            10:
+                name: |
+                    <i>»</i> Perché dovremmo <b>scegliere</b> proprio <b>te</b>? Cosa ti rende un candidato <b>MIGLIORE</b> rispetto agli altri?
+                    Questa domanda ci aiuterà a capire perché dovremmo sceglierti rispetto agli altri candidati.
+                type: text
+                required: true
+                min_length: 0
+                max_length: 10000
     developer:
         name: |
             Developer
@@ -69,71 +145,59 @@ types:
         questions: []
 messages:
     start: |
-        <b>Welcome to the Staff Application Bot!</b>
+        💼 • <b>SEI PRONTO PER LA TUA CANDIDATURA?</b>
+        <i>»</i> Benvenuto nella <i>sezione candidature</i> di <b>Minecraft TG24</b>.
+        Utilizza i pulsanti per <b>muoverti tra le nostre sezioni</b>.
 
-        Please choose an option:
-
-        • <b>Apply:</b> Start your staff application.
-        • <b>Developer:</b> Contact us for bot-related questions or feedback.
-        • <b>Source Code:</b> View the source code for this bot.
-
-        If you have any questions or concerns, please let us know.
+        (❗️) — <b>PER PROCEDERE CON LA CANDIDATURA, UTILIZZA IL TASTO "📝 - Candidati"!</b>
     chooser: |
-        <b>Please select the application you want to complete:</b>
-
-        Click on the "ℹ" button next to an application to get more information.
-
-        Please select only one application to complete. Thank you!
+        💼 • <b>SEI PRONTO PER LA TUA CANDIDATURA?</b>
+        <i>»</i> Scegli uno tra i <b>ruoli</b> che vorresti ricoprire!
+        Se desideri <b>maggiori informazioni</b>, utilizza il pulsante "ℹ"!
     disclaimer: |
-        <b>Disclaimer:</b> We take staff applications seriously. Any troll or meme applications will result in a permanent ban from this bot. Please only submit a staff application if you are serious about joining our team.
+        🔴 • <b>DISCLAIMER, SEI PREGATO DI LEGGERE ATTENTAMENTE!</b>
+        <i>»</i> Prendiamo <b>molto seriamente</b> le candidature staff. Sei pregato di <b>non inviare candidature meme o troll</b>, in caso contrario saremo pronti a <b>prendere provvedimenti</b>.
 
-        If you are ready to begin your application, click the button below. If you are unsure or want to return to the home screen, click the "Return to Home" button.
+        🥇 – <b>COME PROCEDERE!</b>
+        <i>»</i> Nel caso tu sia pronto, utilizza il pulsante sottostante per procedere alla candidatura. 
 
-        Good luck with your application!
     question_template: |
-        📑 | <b>Question no.{number}</b>
+        📑 • <b> Domanda numero.{number}</b>
         {message}
-        ❌ – If you want to cancel your application, click the button below.
+        <b>(❌) – Se vuoi cancellare la tua candidatura, clicca il pulsante.</b>
     work_done: |
-        <b>Thank you for completing your staff application!</b>
+        <b>🏆 •  GRAZIE PER AVER COMPLETATO LA TUA CANDIDATURA!</b>
+        <i>»</i> Apprezziamo il <b>tempo e l'impegno</b> impiegato per rispondere alle nostre domande.
 
-        We appreciate the time and effort you put into answering our questions.
-
-        Please understand that we receive many applications and cannot accept everyone, but we appreciate your interest in joining our team. We wish you the best of luck with your future endeavors.
-
-        Thank you again for your application!
+        <b>⚡️ – LE TUE RISPOSTE VERRANO VISIONATE</b>
+        <i>»</i> La tua candidatura verrà <b>presa sotto carico a breve</b>. Nel caso in cui dovessi <b>essere accettato</b> ti invieremo un nuovo messaggio!
     new_application: |
-        <b>New Staff Application!</b>
+        <b>🧾 • NUOVO PROVINO!</b>
 
-        A new staff application has been submitted by <a href="tg://user?id=%s">%s</a> [<code>%s</code>]. Please click the link below to view the answers:
+        <b>🚹 • Utente:</b> <a href="tg://user?id={userId}">{userName}</a> [<code>{userId}</code>]
 
-        <a href="%s">Click here to view answers</a>
+        <b>❓ • RISPOSTE</b>
+        <a href="{link}">Clicca per aprirle</a>
     accepted: |
-        <b>Congratulations!</b>
-
-        We are pleased to inform you that your staff application has been accepted! You have been invited to join our staff Telegram group, where you will receive further instructions and get to know our team members.
-
-        Please join the group using the link below:
-
-        <a href="%s">Join Our Staff Group</a>
-
-        Thank you for your interest in joining our team, and we look forward to working with you!
+        <b>🏆 •  CONGRATULAZIONI, SEI STATO SCELTO!</b>
+        <i>»</i> La tua candidatura ha <b>riscosso successo</b>! Siamo lieti di informarti che hai <b>superato la prova scritta</b>, a breve verrai <b>contattato dall'amministrazione</b>.
     sending_answers: |
-        ⏳ <b>Sending answers...</b>
+        ⏳ <b>Inviando le risposte...</b>
     already_in_progress: |
-        You are already doing a staff application!
+        Hai già una candidatura avviata!
     already_sent: |
-        You already did a staff application before!
+        Hai già eseguito una candidatura!
     work_cancelled: |
-        You have cancelled your application.
+        Hai cancellato la tua candidatura.
     not_in_progress: |
-        You are in no staff application at the moment!
+        Non stai svolgendo alcuna candidatura al momento!
     answer_not_valid: |
-        Sorry, but the answer is not valid. This question accepts only '{type}' answers
+        Mi dispiace, ma la tua risposta non è valida. Questa domanda accetta solo risposte del tipo <b>'{type}'</b>
     invalid_length: |
-        Sorry, this answer does not meet the current question criteria. Your answer needs to be at least {min} characters long and {max} maximum. Your answer has {length} characters
+        Mi dispiace, questa risposta non rispetta i criteri adeguati. La tua risposta deve contenere almeno <b>{min} caratteri</b> e massimo <b>{max} caratteri</b>. 
+        Al momento, la tua risposta è composta di <b>{length} caratteri</b>.
     only_numbers_answer: |
-        <b>This question requires a number!</b>
+        <b>Questa domanda richiede solamente un numero!</b>
     work_with_no_question: |
         This type of application has no questions to answer. Please come back later.
     error_while_working: |

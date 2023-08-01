@@ -1,0 +1,170 @@
+configuration:
+    # Checks for gibberish in the user's answer. For example:
+    # 
+    # njdasndisasidasadii -> Will not pass
+    # I like monkeys -> Will pass
+    #
+    # By default it uses a pre-trained english matrix. If you want to enable this feature in another language, you will need to train the bot yourself!
+    gibberish_detection: true
+
+buttons:
+    start_button: |
+        📝 - Apply
+    developer_button: |
+        🧑‍💻 - Developer
+    cancel: |
+        ❌ - Cancel
+    home: |
+        🏠 - Return to the home
+    start_work: |
+        ✅ - I'm sure
+    source_button: |
+        📎 - Source code
+    fetch_model: |
+        ⬇ - Get current model
+    train_model: |
+        ⬆ - Train new model
+
+types:
+    moderator:
+        name: |
+            Moderator
+        description: |
+            The moderator is an important figure for the group, responsible for monitoring the group and resolving any issues that may arise.
+        questions:
+            # if required is false, the bot will say that the answer is optional and there will be a button to skip it
+            # Currently does not work
+            1:
+                name: |
+                    » Why do you want to be part of our staff?
+                type: text
+                # required: true
+                min_length: 10
+                max_length: 1000
+            2:
+                name: |
+                    » How old are you?
+                type: number
+                # required: true
+                min_length: -1
+                max_length: -1
+            3:
+                name: |
+                    » Do you like monkeys? Why?
+                type: text
+                # required: true
+                min_length: 0
+                max_length: 10000
+    writer:
+        name: |
+            Writer
+        description: |
+            You write stuff
+        questions: []
+    developer:
+        name: |
+            Developer
+        description: |
+            You code stuff and smash your head onto the keyboard.
+        questions: []
+messages:
+    start: |
+        <b>Welcome to the Staff Application Bot!</b>
+
+        Please choose an option:
+
+        • <b>Apply:</b> Start your staff application.
+        • <b>Developer:</b> Contact us for bot-related questions or feedback.
+        • <b>Source Code:</b> View the source code for this bot.
+
+        If you have any questions or concerns, please let us know.
+    chooser: |
+        <b>Please select the application you want to complete:</b>
+
+        Click on the "ℹ" button next to an application to get more information.
+
+        Please select only one application to complete. Thank you!
+    disclaimer: |
+        <b>Disclaimer:</b> We take staff applications seriously. Any troll or meme applications will result in a permanent ban from this bot. Please only submit a staff application if you are serious about joining our team.
+
+        If you are ready to begin your application, click the button below. If you are unsure or want to return to the home screen, click the "Return to Home" button.
+
+        Good luck with your application!
+    question_template: |
+        📑 | <b>Question no.{number}</b>
+        {message}
+        ❌ – If you want to cancel your application, click the button below.
+    work_done: |
+        <b>Thank you for completing your staff application!</b>
+
+        We appreciate the time and effort you put into answering our questions.
+
+        Please understand that we receive many applications and cannot accept everyone, but we appreciate your interest in joining our team. We wish you the best of luck with your future endeavors.
+
+        Thank you again for your application!
+    new_application: |
+        <b>New Staff Application!</b>
+
+        A new staff application has been submitted by <a href="tg://user?id=%s">%s</a> [<code>%s</code>]. Please click the link below to view the answers:
+
+        <a href="%s">Click here to view answers</a>
+    accepted: |
+        <b>Congratulations!</b>
+
+        We are pleased to inform you that your staff application has been accepted! You have been invited to join our staff Telegram group, where you will receive further instructions and get to know our team members.
+
+        Please join the group using the link below:
+
+        <a href="%s">Join Our Staff Group</a>
+
+        Thank you for your interest in joining our team, and we look forward to working with you!
+    sending_answers: |
+        ⏳ <b>Sending answers...</b>
+    already_in_progress: |
+        You are already doing a staff application!
+    already_sent: |
+        You already did a staff application before!
+    work_cancelled: |
+        You have cancelled your application.
+    not_in_progress: |
+        You are in no staff application at the moment!
+    answer_not_valid: |
+        Sorry, but the answer is not valid. This question accepts only '{type}' answers
+    invalid_length: |
+        Sorry, this answer does not meet the current question criteria. Your answer needs to be at least {min} characters long and {max} maximum. Your answer has {length} characters
+    only_numbers_answer: |
+        <b>This question requires a number!</b>
+    work_with_no_question: |
+        This type of application has no questions to answer. Please come back later.
+    error_while_working: |
+        There was an error while sending your answers to the admins. Please try again later.
+    
+    # Training messages
+    train_menu: |
+        <b>Welcome to the train menu!</b>
+
+        1. Fetch Current Training Data: This option will allow you to retrieve the current training data in a JSON file format. You can use this data to examine the current state of the bot's knowledge and make any necessary changes.
+
+        2. Train Bot: This option will start the training process for the bot, allowing it to improve its language and conversation skills based on new data.
+
+        Please select the option you would like to proceed with.
+    training_first_phase: |
+        👋 To commence our training process, I require three files.
+
+        • Firstly, I need a substantial collection of diverse and legitimate words. It's preferable that the file is at least a few megabytes in size. However, please avoid selecting literature from science fiction and fantasy genres, as these often contain uncommon word formations. (🤔 For instance, the default model was trained using a Sherlock Holmes novel.) <a href="https://raw.githubusercontent.com/ImOnlyFire/applications-bot/main/gibberish/defaults/good.txt">Example</a>
+
+        • Secondly, I need a file with around 20 simple and straightforward phrases that are easy to comprehend and free of complex language or unusual word formations. <a href="https://raw.githubusercontent.com/ImOnlyFire/applications-bot/main/gibberish/defaults/goodsm.txt">Example</a>
+
+        • Finally, I need a file filled with overtly bad words and gibberish. This file will assist our AI model in learning what constitutes gibberish text and how to recognize it. 🧐 <a href="https://raw.githubusercontent.com/ImOnlyFire/applications-bot/main/gibberish/defaults/bad.txt">Example</a>
+       
+        <b>Let's start with the first file. Just send me the text file containing the stuff I said in the first bullet point.</b>
+    training_second_phase: |
+        Seems good! Now please send the second file. 
+    training_final_phase: |
+        Good job! now please send the last file.
+    training_in_progress: |
+        ⏳ <b>Training...</b>
+    training_done: |
+        🎉 Training process has been completed!
+    training_cancelled: |
+        Training process has been cancelled.

@@ -1,7 +1,6 @@
-import {buttons, messages, types} from "./config";
-import {Menu} from "@grammyjs/menu";
-import {BotContext} from "./index";
-import {InputFile} from "grammy";
+import { buttons, messages, types } from "./config.ts";
+import { Menu } from "https://deno.land/x/grammy_menu@v1.2.1/mod.ts";
+import { BotContext } from "./index.ts";
 
 export const homeMenu = new Menu<BotContext>("home-menu")
     .submenu(buttons['start_button'], "chooser-menu", async (ctx) => await ctx.editMessageText(messages['chooser'])).row()
@@ -75,16 +74,16 @@ export function createChooserMenu() {
 
 
 // Train
-export const trainMenu = new Menu<BotContext>("train-menu", {autoAnswer: false})
-    .text(buttons['fetch_model'], async (ctx) => {
-        await ctx.replyWithDocument(new InputFile('gibberish/model.json'));
-    }).row()
-    .text(buttons['train_model'], async (ctx) => {
-        await ctx.conversation.enter('train');
-    });
-export const cancelTrainMenu = new Menu<BotContext>("cancel-training-menu", {autoAnswer: false})
-    .text(buttons['cancel'], async (ctx) => {
-        await ctx.answerCallbackQuery();
-        await ctx.conversation.exit();
-        await ctx.reply(messages['training_cancelled'], {reply_markup: {remove_keyboard: true}});
-    });
+// export const trainMenu = new Menu<BotContext>("train-menu", {autoAnswer: false})
+//     .text(buttons['fetch_model'], async (ctx) => {
+//         await ctx.replyWithDocument(new InputFile('gibberish/model.json'));
+//     }).row()
+//     .text(buttons['train_model'], async (ctx) => {
+//         await ctx.conversation.enter('train');
+//     });
+// export const cancelTrainMenu = new Menu<BotContext>("cancel-training-menu", {autoAnswer: false})
+//     .text(buttons['cancel'], async (ctx) => {
+//         await ctx.answerCallbackQuery();
+//         await ctx.conversation.exit();
+//         await ctx.reply(messages['training_cancelled'], {reply_markup: {remove_keyboard: true}});
+//     });
