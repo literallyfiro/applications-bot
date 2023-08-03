@@ -2,8 +2,10 @@
 
 sessions/
 
-.idea/
-.vscode/
+.idea
+.vscode
 
 gibberish/*
 !gibberish/defaults
+
+bot/mongo

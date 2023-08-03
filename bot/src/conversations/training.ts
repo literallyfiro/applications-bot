@@ -1,5 +1,5 @@
 import "https://deno.land/x/dotenv@v3.2.2/load.ts";
-import { InputFile } from "https://deno.land/x/grammy@v1.15.3/types.deno.ts";
+import { InputFile } from "https://deno.land/x/grammy@v1.17.2/types.deno.ts";
 import { Conversation } from "https://deno.land/x/grammy_conversations@v1.1.2/conversation.ts";
 import { messages } from "../config.ts";
 import { BotContext } from "../index.ts";

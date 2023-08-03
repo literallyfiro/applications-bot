@@ -1,5 +1,7 @@
+// @ts-nocheck Deno has some problems with the context types
+
 import "https://deno.land/x/dotenv@v3.2.2/load.ts";
-import { Bot, Context, session, SessionFlavor } from "https://deno.land/x/grammy@v1.15.3/mod.ts";
+import { Bot, Context, session, SessionFlavor } from "https://deno.land/x/grammy@v1.17.2/mod.ts";
 import { run } from "https://deno.land/x/grammy_runner@v2.0.3/mod.ts";
 import { Conversation, ConversationFlavor, conversations, createConversation } from "https://deno.land/x/grammy_conversations@v1.1.2/mod.ts";
 import { hydrateReply, parseMode } from "https://deno.land/x/grammy_parse_mode@1.7.1/mod.ts";
@@ -41,6 +43,7 @@ async function setupDatabase() {
 
     const client = new MongoClient();
     await client.connect(Deno.env.get("MONGODB_URI")!);
+
     const db = client.database("applications-bot");
     return db.collection<UserSchema>("users")
 }

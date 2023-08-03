@@ -1,7 +1,7 @@
-import { buttons, messages, types } from "./config.ts";
 import { Menu } from "https://deno.land/x/grammy_menu@v1.2.1/mod.ts";
+import { InputFile } from "https://deno.land/x/grammy@v1.17.2/types.ts";
+import { buttons, messages, types } from "./config.ts";
 import { BotContext, users } from "./index.ts";
-import { InputFile } from "https://deno.land/x/grammy@v1.15.3/types.ts";
 
 export const homeMenu = new Menu<BotContext>("home-menu")
     .submenu(buttons['start_button'], "chooser-menu", async (ctx) => await ctx.editMessageText(messages['chooser'])).row()
