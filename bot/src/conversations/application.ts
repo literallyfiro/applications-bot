@@ -67,24 +67,26 @@ export async function work(conversation: BotConversation, ctx: BotContext) {
 
     }
 
-    users.updateOne({ user_id: ctx.from?.id }, {
-        $set: {
-            answers: {
-                [key]: answers
-            },
-            in_progress: null,
-        }
-    });
-
     const messageId = (await ctx.api.sendMessage(chatId, messages['sending_answers'])).message_id;
-    await conversation.external(async () => await sendAnswersToAdmin(ctx, key)).then(async () => {
+    await conversation.external(async () => {
+        await users.updateOne({ user_id: ctx.from?.id }, {
+            $set: {
+                answers: {
+                    [key]: answers
+                },
+                in_progress: null,
+            }
+        });
+
+        await sendAnswersToAdmin(ctx, key)
+    }).then(async () => {
         await ctx.api.editMessageText(chatId, messageId, messages['work_done']);
     }).catch(async (err) => {
         await ctx.api.editMessageText(chatId, messageId, messages['error_while_working']);
         conversation.error("Error while sending answers to admin", err);
 
         // revert changes to the db
-        users.updateOne({ user_id: ctx.from?.id }, {
+        await users.updateOne({ user_id: ctx.from?.id }, {
             $set: {
                 answers: {},
                 in_progress: null,
