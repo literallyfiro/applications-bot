@@ -1,18 +1,14 @@
-import {configuration, messages, types} from "../config";
-import {cancelMenu} from "../menus.js";
-import {Pastee} from "../pastee";
-import {format} from "util";
-import {Conversation} from "@grammyjs/conversations";
-import {BotContext, gibberish} from "../index.js";
+import "https://deno.land/x/dotenv@v3.2.2/load.ts";
+import { configuration, messages, types } from "../config.ts";
+import { cancelMenu } from "../menus.ts";
+import { Pastee } from "../pastee.ts";
+import { BotConversation, BotContext, users } from "../index.ts";
+import { format } from "https://deno.land/x/format@1.0.1/mod.ts";
+import { testString } from "../gibberish.ts";
 
-
-const applicationKey = process.env.PASTEE_KEY;
-const logGroupId = process.env.LOG_GROUP_ID;
-
-
-export async function work(conversation: Conversation<BotContext>, ctx: BotContext) {
+export async function work(conversation: BotConversation, ctx: BotContext) {
     const chatId = ctx.chat!.id;
-    const key = conversation.session.in_progress!;
+    const key = await users.findOne({ user_id: ctx.from?.id }).then((user) => user?.in_progress!);
     const answers: string[] = [];
     const questions = types[key]['questions'];
 
@@ -27,10 +23,10 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
         const currentQuestion = (Object.keys(questions).indexOf(questionKey) + 1).toString();
 
         const questionMessage = (messages['question_template']).replace('{message}', questionName).replace('{number}', currentQuestion);
+        await ctx.reply(questionMessage, { reply_markup: cancelMenu });
 
         let answerIsValid = false;
         while (!answerIsValid) {
-            await ctx.reply(questionMessage, {reply_markup: cancelMenu});
             const reply = await conversation.waitFor(':text');
 
             if (reply == null) {
@@ -40,20 +36,19 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
 
             const replyText = reply.message?.text!;
             if (questionType === 'number') {
-                let numberReply: number = parseInt(replyText);
+                const numberReply: number = parseInt(replyText);
                 if (isNaN(numberReply)) {
                     await ctx.reply(messages['only_numbers_answer']);
                     continue;
                 }
                 answers.push(replyText);
-                conversation.session.user_answers[key] = answers;
                 break;
             }
             if (replyText == null) {
                 await ctx.reply(messages['answer_not_valid'].replace('{type}', questionType));
                 continue;
             }
-            if (configuration.gibberish_detection && gibberish.detect(replyText)) {
+            if (configuration["gibberish_detection"] && !testString(replyText)) {
                 await ctx.reply("Please don't use gibberish in your answers.");
                 continue;
             }
@@ -68,28 +63,45 @@ export async function work(conversation: Conversation<BotContext>, ctx: BotConte
             answerIsValid = true;
 
             answers.push(replyText);
-            conversation.session.user_answers[key] = answers;
         }
 
     }
 
+    users.updateOne({ user_id: ctx.from?.id }, {
+        $set: {
+            answers: {
+                [key]: answers
+            },
+            in_progress: null,
+        }
+    });
+
     const messageId = (await ctx.api.sendMessage(chatId, messages['sending_answers'])).message_id;
-    await conversation.external(async () => await sendAnswersToAdmin(conversation, ctx)).then(async () => {
+    await conversation.external(async () => await sendAnswersToAdmin(ctx, key)).then(async () => {
         await ctx.api.editMessageText(chatId, messageId, messages['work_done']);
     }).catch(async (err) => {
         await ctx.api.editMessageText(chatId, messageId, messages['error_while_working']);
-        console.error(err);
+        conversation.error("Error while sending answers to admin", err);
+
+        // revert changes to the db
+        users.updateOne({ user_id: ctx.from?.id }, {
+            $set: {
+                answers: {},
+                in_progress: null,
+            }
+        });
     });
 
-    conversation.session.in_progress = undefined;
     return;
 }
 
-async function sendAnswersToAdmin(conversation: Conversation<BotContext>, ctx: BotContext) {
-    const key = conversation.session.in_progress!;
-    const userAnswers = conversation.session.user_answers;
+const applicationKey = Deno.env.get("PASTEE_KEY")!;
+const logGroupId = Deno.env.get("LOG_GROUP_ID")!;
+
+async function sendAnswersToAdmin(ctx: BotContext, key: string) {
     const userId = ctx.from?.id;
     const userName = ctx.from?.first_name;
+    const userAnswers = await users.findOne({ user_id: ctx.from?.id }).then((user) => user?.answers!);
 
     let answersStr = "";
     userAnswers[key].forEach((element, index) => {
@@ -102,7 +114,10 @@ async function sendAnswersToAdmin(conversation: Conversation<BotContext>, ctx: B
 
     const pasteJson = await new Pastee(answersStr, applicationKey, "text", `${userName} (${key}) application - ${new Date().toLocaleDateString()}`, "main", true).createPaste();
     const link = `https://paste.ee/r/${pasteJson['id']}`;
-    const message = format(messages['new_application'], userId, userName, userId, link);
-
-    await ctx.api.sendMessage(logGroupId, message, {disable_web_page_preview: true});
+    const message = format(messages['new_application'], {
+        userId: userId,
+        userName: userName,
+        link: link,
+    });
+    await ctx.api.sendMessage(logGroupId, message, { disable_web_page_preview: true });
 }

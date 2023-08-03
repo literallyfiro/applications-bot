@@ -18,7 +18,7 @@ export class Pastee {
         this.endpoint = "https://api.paste.ee/v1/pastes";
     }
 
-    async createPaste() {
+    createPaste() {
         return (async () => {
             const rawResponse = await fetch(this.endpoint, {
                 method: 'POST',

@@ -1,6 +1,6 @@
 export interface ConfigData {
     configuration: {
-        [key: string]: any
+        [key: string]: boolean
     };
     types: {
         [key: string]: {
@@ -24,11 +24,12 @@ export interface ConfigData {
     };
 }
 
-import {load} from "js-yaml";
-import {readFileSync} from "fs";
+import * as mod from "https://deno.land/std@0.196.0/yaml/mod.ts";
 
 const filepath = "config/config.yml";
-const yaml = load(readFileSync(filepath, "utf8")) as ConfigData;
+const decoder = new TextDecoder("utf-8");
+const data = Deno.readFileSync(filepath);
+const yaml = mod.parse(decoder.decode(data)) as ConfigData;
 
 export const types = yaml.types;
 export const buttons = yaml.buttons;

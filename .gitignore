@@ -2,11 +2,10 @@
 
 sessions/
 
-.idea/
-
-node_modules/
-
-dist/
+.idea
+.vscode
 
 gibberish/*
 !gibberish/defaults
+
+bot/mongo
