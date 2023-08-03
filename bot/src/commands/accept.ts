@@ -7,19 +7,19 @@ export async function acceptCommand(ctx: BotContext) {
 
     await users.findOne({ user_id: userId }).then(async (user) => {
         if (user == null) {
-            await ctx.reply("User is not registered.");
+            await ctx.reply(messages['user_not_registered']);
             return;
         }
         if (user.status.is_accepted) {
-            await ctx.reply("User is already accepted.");
+            await ctx.reply(messages['user_already_accepted']);
             return;
         }
         if (user.status.is_banned) {
-            await ctx.reply("User is banned. You can't accept him.");
+            await ctx.reply(messages['user_accept_banned']);
             return;
         }
         if (Object.keys(user.answers).length == 0) {
-            await ctx.reply("User has not answered any questions yet.");
+            await ctx.reply(messages['user_accept_no_questions']);
             return;
         }
 
@@ -37,7 +37,7 @@ export async function acceptCommand(ctx: BotContext) {
             const message = format(messages['accepted'], { link: link });
             await ctx.api.sendMessage(userId, message, { disable_web_page_preview: true });
 
-            await ctx.reply("User accepted successfully.");
+            await ctx.reply(messages['user_accepted']);
         });
     });
 }

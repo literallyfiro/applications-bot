@@ -32,27 +32,22 @@ types:
         description: |
             The moderator is an important figure for the group, responsible for monitoring the group and resolving any issues that may arise.
         questions:
-            # if required is false, the bot will say that the answer is optional and there will be a button to skip it
-            # Currently does not work
             1:
                 name: |
                     » Why do you want to be part of our staff?
                 type: text
-                # required: true
                 min_length: 10
                 max_length: 1000
             2:
                 name: |
                     » How old are you?
                 type: number
-                # required: true
                 min_length: -1
                 max_length: -1
             3:
                 name: |
                     » Do you like monkeys? Why?
                 type: text
-                # required: true
                 min_length: 0
                 max_length: 10000
     writer:
@@ -134,10 +129,38 @@ messages:
         Sorry, this answer does not meet the current question criteria. Your answer needs to be at least {min} characters long and {max} maximum. Your answer has {length} characters
     only_numbers_answer: |
         <b>This question requires a number!</b>
+    gibberish_detected: |
+        Please do not use gibberish in your answers.
     work_with_no_question: |
         This type of application has no questions to answer. Please come back later.
     error_while_working: |
         There was an error while sending your answers to the admins. Please try again later.
+    banned: |
+        You are banned. You can't use this bot.
+    
+    # Admin messages
+    invalid_usage: |
+        Please provide a valid user id to {use}. Correct usage: <code>{command} [user id]</code>
+    invalid_id: |
+        Please provide a valid user id. Correct usage: <code>{command} [user id]</code>
+    user_not_registered: |
+        User is not registered.
+    user_already_accepted: |
+        User is already accepted.
+    user_accept_banned: |
+        User is banned. You can't accept them.
+    user_accept_no_questions: |
+        User has not answered any questions yet.
+    user_accepted: |
+        User accepted successfully.
+    user_unban_not_banned: |
+        User is not banned.
+    user_unbanned: |
+        User unbanned successfully.
+    user_ban_already_banned: |
+        User is already banned.
+    user_banned: |
+        User banned successfully.
     
     # Training messages
     train_menu: |

@@ -1,3 +1,4 @@
+import { messages } from "../config.ts";
 import { BotContext, users } from "../index.ts";
 
 export async function banCommand(ctx: BotContext) {
@@ -5,11 +6,11 @@ export async function banCommand(ctx: BotContext) {
 
     await users.findOne({user_id: userId}).then(async (user) => {
         if (user == null) {
-            await ctx.reply("User is not registered.");
+            await ctx.reply(messages['user_not_registered']);
             return;
         }
         if (user.status.is_banned) {
-            await ctx.reply("User is already banned.");
+            await ctx.reply(messages['user_ban_already_banned']);
             return;
         }
 
@@ -22,7 +23,7 @@ export async function banCommand(ctx: BotContext) {
                 }
             }
         }).then(async () => {
-            await ctx.reply("User banned successfully.");
+            await ctx.reply(messages['user_banned']);
         });
     });
 }

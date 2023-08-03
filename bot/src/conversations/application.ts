@@ -49,7 +49,7 @@ export async function work(conversation: BotConversation, ctx: BotContext) {
                 continue;
             }
             if (configuration["gibberish_detection"] && !testString(replyText)) {
-                await ctx.reply("Please don't use gibberish in your answers.");
+                await ctx.reply(messages["gibberish_detected"]);
                 continue;
             }
             if ((replyText.length < questionMinLength) || (replyText.length > questionMaxLength)) {

@@ -86,7 +86,7 @@ function setupPrivateActions(bot: Bot<ParseModeFlavor<BotContext>>) {
         })
         .on(["msg", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
             console.log("User " + ctx.from.id + " is banned. Ignoring message.");
-            ctx.reply("You are banned. You can't use this bot.");
+            ctx.reply(messages['banned']);
         });
 
     privateChatType.use(cancelMenu);
@@ -142,13 +142,13 @@ function setupGroupActions(bot: Bot<ParseModeFlavor<BotContext>>) {
             const command: string[] = text.split(" ");
             // check if id is provided
             if (command.length != 2) {
-                ctx.reply(`Please provide a valid user id to ${command[0].replace('/', '')}. Correct usage: <code>${command[0]} [user id]</code>`);
+                ctx.reply(format(messages['invalid_usage'], { use: command[0].replace('/', ''), command: command[0] }));
                 return false;
             }
             // check if id is a number
             const id: number = parseInt(command[1]);
             if (isNaN(id)) {
-                ctx.reply("Please provide a valid user id. Correct usage: <code>" + command[0] + " [user id]</code>");
+                ctx.reply(format(messages['invalid_id'], { command: command[0] }));
                 return false;
             }
             return true;
