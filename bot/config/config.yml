@@ -105,9 +105,9 @@ messages:
     new_application: |
         <b>New Staff Application!</b>
 
-        A new staff application has been submitted by <a href="tg://user?id=%s">%s</a> [<code>%s</code>]. Please click the link below to view the answers:
+        A new staff application has been submitted by <a href="tg://user?id={userId}">{userName}</a> [<code>{userId}</code>]. Please click the link below to view the answers:
 
-        <a href="%s">Click here to view answers</a>
+        <a href="{link}">Click here to view answers</a>
     accepted: |
         <b>Congratulations!</b>
 
@@ -115,7 +115,7 @@ messages:
 
         Please join the group using the link below:
 
-        <a href="%s">Join Our Staff Group</a>
+        <a href="{link}">Join Our Staff Group</a>
 
         Thank you for your interest in joining our team, and we look forward to working with you!
     sending_answers: |
