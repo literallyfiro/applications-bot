@@ -16,6 +16,7 @@ import { banCommand } from "./commands/ban.ts";
 import { unbanCommand } from "./commands/unban.ts";
 import { reloadModel } from "./gibberish.ts";
 import { training_mode } from "./conversations/training.ts";
+import { resetCommand } from "./commands/reset.ts";
 
 export type BotContext = Context & ConversationFlavor & SessionFlavor<Context>;
 export type BotConversation = Conversation<BotContext>;
@@ -45,7 +46,15 @@ async function setupDatabase() {
     await client.connect(Deno.env.get("MONGODB_URI")!);
 
     const db = client.database("applications-bot");
-    return db.collection<UserSchema>("users")
+    const usersCollection = db.collection<UserSchema>("users");
+
+    await usersCollection.updateMany({}, {
+        $set: {
+            in_progress: null,
+        }
+    });
+
+    return usersCollection;
 }
 
 function setupBot() {
@@ -78,16 +87,16 @@ function setupPrivateActions(bot: Bot<ParseModeFlavor<BotContext>>) {
     const privateChatType = bot.chatType("private");
 
     // Banned users can't do anything in private, so we filter them out
-    privateChatType
-        .filter(async (ctx) => {
-            // check if user is banned
-            const userInDb = await users.findOne({ user_id: ctx.from?.id });
-            return userInDb!.status.is_banned;
-        })
-        .on(["msg", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
+    privateChatType.use(async (ctx, next) => {
+        const userInDb = await users.findOne({ user_id: ctx.from?.id });
+        if (userInDb != undefined && userInDb.status.is_banned) {
             console.log("User " + ctx.from.id + " is banned. Ignoring message.");
             ctx.reply(messages['banned']);
-        });
+            return;
+        }
+        
+        await next();
+    });
 
     privateChatType.use(cancelMenu);
     privateChatType.use(createConversation<BotContext>(work));
@@ -130,7 +139,7 @@ function setupGroupActions(bot: Bot<ParseModeFlavor<BotContext>>) {
     const layout = groupChatType.on("::bot_command")
         .filter((ctx) => {
             const command = ctx.message!.text?.split(" ")[0];
-            return command == "/ban" || command == "/unban" || command == "/accept";
+            return command == "/ban" || command == "/unban" || command == "/accept" || command == "/reset";
         })
         .filter(async (ctx) => {
             const user = await ctx.getAuthor();
@@ -157,6 +166,7 @@ function setupGroupActions(bot: Bot<ParseModeFlavor<BotContext>>) {
     layout.command("ban", (ctx) => banCommand(ctx));
     layout.command("unban", (ctx) => unbanCommand(ctx));
     layout.command("accept", (ctx) => acceptCommand(ctx));
+    layout.command("reset", (ctx) => resetCommand(ctx));
 }
 
 async function loadGibberishModel() {
