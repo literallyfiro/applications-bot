@@ -1,29 +1,25 @@
-import {BotContext, sessions} from '../index';
-import {TempData} from '../session';
+import { BotContext, users } from "../index.ts";
 
 export async function banCommand(ctx: BotContext) {
-    const id: string = ctx.match?.toString()!;
+    const userId = Number(ctx.match?.toString());
 
-    await sessions.findOne({key: id}).then(async (user) => {
+    await users.findOne({user_id: userId}).then(async (user) => {
         if (user == null) {
             await ctx.reply("User is not registered.");
             return;
         }
-        const userData = (user.value as TempData).__d;
-        if (userData.accepted) {
-            await ctx.reply("User is already accepted.");
-            return;
-        }
-        if (userData.banned) {
+        if (user.status.is_banned) {
             await ctx.reply("User is already banned.");
             return;
         }
 
-        await sessions.updateOne({key: id}, {
+        await users.updateOne({user_id: userId}, {
             $set: {
-                "value.__d.banned": true,
-                "value.__d.user_answers": {},
-                "value.__d.accepted": false
+                answers: {},
+                status: {
+                    is_banned: true,
+                    is_accepted: false
+                }
             }
         }).then(async () => {
             await ctx.reply("User banned successfully.");

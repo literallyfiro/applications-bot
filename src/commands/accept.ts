@@ -1,53 +1,43 @@
+import { format } from "https://deno.land/x/format@1.0.1/mod.ts";
 import { messages } from '../config.ts';
-import { BotContext, userSessions } from '../index.ts';
-import { readFileSync } from "node:fs";
-
+import { BotContext, users } from '../index.ts';
 
 export async function acceptCommand(ctx: BotContext) {
-    const id: string = ctx.match?.toString()!;
+    const userId = Number(ctx.match?.toString());
 
-    const sessionFile = readFileSync(userSessions[id];
+    await users.findOne({ user_id: userId }).then(async (user) => {
+        if (user == null) {
+            await ctx.reply("User is not registered.");
+            return;
+        }
+        if (user.status.is_accepted) {
+            await ctx.reply("User is already accepted.");
+            return;
+        }
+        if (user.status.is_banned) {
+            await ctx.reply("User is banned. You can't accept him.");
+            return;
+        }
+        if (Object.keys(user.answers).length == 0) {
+            await ctx.reply("User has not answered any questions yet.");
+            return;
+        }
 
-    if (sessionFile == null) {
-        await ctx.reply("User is not registered.");
-        return;
-    }
+        await users.updateOne({ user_id: userId }, {
+            $set: {
+                answers: {},
+                status: {
+                    is_banned: false,
+                    is_accepted: true
+                }
+            }
+        }).then(async () => {
+            const chatInvite = await ctx.createChatInviteLink({ member_limit: 1 });
+            const link = chatInvite.invite_link;
+            const message = format(messages['accepted'], { link: link });
+            await ctx.api.sendMessage(userId, message, { disable_web_page_preview: true });
 
-    const data = JSON.parse(sessionFile, 'utf8'));
-
-
-
-    // await sessions.findOne({key: id}).then(async (user)=> {
-    //     if (user == null) { 
-    //         await ctx.reply("User is not registered.");
-    //         return;
-    //     }
-    //     const userData = (user.value as TempData).__d;
-    //     if (userData.accepted) {
-    //         await ctx.reply("User is already accepted.");
-    //         return;
-    //     }
-    //     if (Object.keys(userData.user_answers).length == 0) {
-    //         await ctx.reply("User has not answered any questions yet.");
-    //         return;
-    //     }
-    //     if (userData.banned) {
-    //         await ctx.reply("User is banned. You can't accept him.");
-    //         return;
-    //     }
-
-    //     await sessions.updateOne({key: id}, {
-    //         $set: {
-    //             "value.__d.user_answers": {},
-    //             "value.__d.accepted": true
-    //         }
-    //     }).then(async () => {
-    //         const chatInvite = await ctx.createChatInviteLink({member_limit: 1});
-    //         const link = chatInvite.invite_link;
-    //         const message = format(messages['accepted'], link);
-    //         await ctx.api.sendMessage(id!, message, {disable_web_page_preview: true});
-
-    //         await ctx.reply("User accepted successfully.");
-    //     });
-    // });
+            await ctx.reply("User accepted successfully.");
+        });
+    });
 }

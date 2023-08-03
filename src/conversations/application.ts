@@ -1,13 +1,14 @@
 import "https://deno.land/x/dotenv@v3.2.2/load.ts";
-import { messages, types } from "../config.ts";
+import { configuration, messages, types } from "../config.ts";
 import { cancelMenu } from "../menus.ts";
 import { Pastee } from "../pastee.ts";
-import { BotConversation, BotContext } from "../index.ts";
+import { BotConversation, BotContext, users } from "../index.ts";
 import { format } from "https://deno.land/x/format@1.0.1/mod.ts";
+import { testString } from "../gibberish.ts";
 
 export async function work(conversation: BotConversation, ctx: BotContext) {
     const chatId = ctx.chat!.id;
-    const key = conversation.session.in_progress!;
+    const key = await users.findOne({ user_id: ctx.from?.id }).then((user) => user?.in_progress!);
     const answers: string[] = [];
     const questions = types[key]['questions'];
 
@@ -41,17 +42,16 @@ export async function work(conversation: BotConversation, ctx: BotContext) {
                     continue;
                 }
                 answers.push(replyText);
-                conversation.session.user_answers[key] = answers;
                 break;
             }
             if (replyText == null) {
                 await ctx.reply(messages['answer_not_valid'].replace('{type}', questionType));
                 continue;
             }
-            // if (configuration.gibberish_detection && gibberish.detect(replyText)) {
-            //     await ctx.reply("Please don't use gibberish in your answers.");
-            //     continue;
-            // }
+            if (configuration["gibberish_detection"] && !testString(replyText)) {
+                await ctx.reply("Please don't use gibberish in your answers.");
+                continue;
+            }
             if ((replyText.length < questionMinLength) || (replyText.length > questionMaxLength)) {
                 const message = messages['invalid_length']
                     .replace('{min}', questionMinLength.toString())
@@ -63,31 +63,45 @@ export async function work(conversation: BotConversation, ctx: BotContext) {
             answerIsValid = true;
 
             answers.push(replyText);
-            conversation.session.user_answers[key] = answers;
         }
 
     }
 
+    users.updateOne({ user_id: ctx.from?.id }, {
+        $set: {
+            answers: {
+                [key]: answers
+            },
+            in_progress: null,
+        }
+    });
+
     const messageId = (await ctx.api.sendMessage(chatId, messages['sending_answers'])).message_id;
-    await conversation.external(async () => await sendAnswersToAdmin(conversation, ctx)).then(async () => {
+    await conversation.external(async () => await sendAnswersToAdmin(ctx, key)).then(async () => {
         await ctx.api.editMessageText(chatId, messageId, messages['work_done']);
     }).catch(async (err) => {
         await ctx.api.editMessageText(chatId, messageId, messages['error_while_working']);
         conversation.error("Error while sending answers to admin", err);
+
+        // revert changes to the db
+        users.updateOne({ user_id: ctx.from?.id }, {
+            $set: {
+                answers: {},
+                in_progress: null,
+            }
+        });
     });
 
-    conversation.session.in_progress = undefined;
     return;
 }
 
 const applicationKey = Deno.env.get("PASTEE_KEY")!;
 const logGroupId = Deno.env.get("LOG_GROUP_ID")!;
 
-async function sendAnswersToAdmin(conversation: BotConversation, ctx: BotContext) {
-    const key = conversation.session.in_progress!;
-    const userAnswers = conversation.session.user_answers;
+async function sendAnswersToAdmin(ctx: BotContext, key: string) {
     const userId = ctx.from?.id;
     const userName = ctx.from?.first_name;
+    const userAnswers = await users.findOne({ user_id: ctx.from?.id }).then((user) => user?.answers!);
 
     let answersStr = "";
     userAnswers[key].forEach((element, index) => {

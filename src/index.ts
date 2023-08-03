@@ -1,111 +1,130 @@
 import "https://deno.land/x/dotenv@v3.2.2/load.ts";
 import { Bot, Context, session, SessionFlavor } from "https://deno.land/x/grammy@v1.15.3/mod.ts";
-import { run, sequentialize } from "https://deno.land/x/grammy_runner@v2.0.3/mod.ts";
-import { type Conversation, type ConversationFlavor, conversations, createConversation } from "https://deno.land/x/grammy_conversations@v1.1.2/mod.ts";
+import { run } from "https://deno.land/x/grammy_runner@v2.0.3/mod.ts";
+import { Conversation, ConversationFlavor, conversations, createConversation } from "https://deno.land/x/grammy_conversations@v1.1.2/mod.ts";
 import { hydrateReply, parseMode } from "https://deno.land/x/grammy_parse_mode@1.7.1/mod.ts";
-import { type ParseModeFlavor } from "https://deno.land/x/grammy_parse_mode@1.7.1/mod.ts";
+import { ParseModeFlavor } from "https://deno.land/x/grammy_parse_mode@1.7.1/mod.ts";
 import { autoRetry } from "https://esm.sh/@grammyjs/auto-retry@1.1.1";
-import { hydrateFiles } from "https://deno.land/x/grammy_files@v1.0.4/mod.ts";
-import { FileAdapter } from "https://deno.land/x/grammy_storages@v2.3.0/file/src/mod.ts";
-import { type UserData } from "./session_data.ts";
-import { cancelMenu, homeMenu, createChooserMenu } from "./menus.ts";
+import { MongoClient, ObjectId } from "https://deno.land/x/mongo@v0.31.2/mod.ts";
+import { cancelMenu, homeMenu, createChooserMenu, cancelTrainMenu, trainMenu } from "./menus.ts";
 import { work } from "./conversations/application.ts";
-import { messages } from "./config.ts";
+import { configuration, messages } from "./config.ts";
 import { acceptCommand } from "./commands/accept.ts";
-import * as fs from "node:fs";
+import { banCommand } from "./commands/ban.ts";
+import { unbanCommand } from "./commands/unban.ts";
+import { reloadModel } from "./gibberish.ts";
+import { training_mode } from "./conversations/training.ts";
 
-export type BotContext = Context & SessionFlavor<UserData> & ConversationFlavor;
+export type BotContext = Context & ConversationFlavor & SessionFlavor<Context>;
 export type BotConversation = Conversation<BotContext>;
-export const userSessions = {}
-const sessionsPath = './sessions/';
 
-function getSessionKey(ctx: Context): string | undefined {
-    return ctx.from?.id.toString();
+export interface UserSchema {
+    _id: ObjectId;
+    user_id: number;
+    answers: {
+        [key: string]: string[];
+    };
+    status: {
+        is_banned: boolean;
+        is_accepted: boolean;
+    };
+    created_at: Date;
+    in_progress: string | null;
 }
 
-const bot = new Bot<ParseModeFlavor<BotContext>>(Deno.env.get("BOT_TOKEN")!);
-bot.use(hydrateReply);
-bot.api.config.use(hydrateFiles(bot.token));
-bot.api.config.use(autoRetry());
-bot.api.config.use(parseMode("HTML"));
-bot.use(sequentialize(getSessionKey));
-bot.use(session({
-    getSessionKey: getSessionKey,
-    initial: (): UserData => ({ user_answers: {}, in_progress: undefined, banned: false, accepted: false }),
-    storage: new FileAdapter({ dirName: "sessions" }),
-}));
-bot.use(async (ctx, next) => {
-    const userId = ctx.from?.id;
-    
-    // Check if session file path exists for the user ID
-    if (!userSessions[userId]) {
-      // Generate a unique session file name
-      const sessionFileName = `session_${userId}.json`;
-      
-      // Create session file path
-      const sessionFilePath = `${sessionsPath}${sessionFileName}`;
-  
-      // Create a new session file if it doesn't exist
-      if (!fs.existsSync(sessionFilePath)) {
-        fs.writeFileSync(sessionFilePath, '{}');
-      }
-  
-      // Update the mapping with the session file path
-      userSessions[userId] = sessionFilePath;
-    }
-  
-    // Read the session file and parse its contents
-    
-  
-    // Set the session data to the ctx.session property
-    // sessionData = ctx.session;
-  
-    await next();
-  
-    // After handling the request, save the updated session data back to the file
-    const updatedSessionData = JSON.stringify(ctx.session);
-    fs.writeFileSync(userSessions[userId], updatedSessionData, 'utf8');
-  });
-bot.use(conversations());
-bot.catch((err) => {
-    const ctx = err.ctx;
-    const e = err.error;
-    console.error(`Error while handling update ${ctx.update.update_id}:`, e);
-});
 
-// All private stuff
-const privateActions = () => {
-    const privateTypes = bot.chatType("private")
+export const users = await setupDatabase();
+const bot = setupBot();
+
+async function setupDatabase() {
+    console.log("Connecting to database...");
+
+    const client = new MongoClient();
+    await client.connect(Deno.env.get("MONGODB_URI")!);
+    const db = client.database("applications-bot");
+    return db.collection<UserSchema>("users")
+}
+
+function setupBot() {
+    const bot = new Bot<ParseModeFlavor<BotContext>>(Deno.env.get("BOT_TOKEN")!);
+
+    // Install parse mode plugin
+    bot.use(hydrateReply);
+    // Install session plugin
+    bot.use(session({ initial() { return {} } }));
+    // Install conversations plugin
+    bot.use(conversations());
+
+    // Retry API Requests if they fail for some reason
+    bot.api.config.use(autoRetry());
+    // Use HTML as default parse mode
+    bot.api.config.use(parseMode("HTML"));
+
+    bot.catch((err) => {
+        console.error(`Error while handling update ${err.ctx.update.update_id}:`, err.error);
+    });
+
+    setupPrivateActions(bot);
+    setupGroupActions(bot);
+
+    return bot;
+}
+
+
+function setupPrivateActions(bot: Bot<ParseModeFlavor<BotContext>>) {
+    const privateChatType = bot.chatType("private");
+
     // Banned users can't do anything in private, so we filter them out
-    privateTypes
-        .filter((ctx) => ctx.session.banned)
+    privateChatType
+        .filter(async (ctx) => {
+            // check if user is banned
+            const userInDb = await users.findOne({ user_id: ctx.from?.id });
+            return userInDb!.status.is_banned;
+        })
         .on(["msg", "callback_query", "inline_query", ":file", "edit"], (ctx) => {
             console.log("User " + ctx.from.id + " is banned. Ignoring message.");
             ctx.reply("You are banned. You can't use this bot.");
         });
 
-    // Custom menus and conversations
-    privateTypes.use(cancelMenu);
-    privateTypes.use(createConversation<BotContext>(work));
-    privateTypes.use(homeMenu);
-    privateTypes.use(createChooserMenu());
-    // Commands
-    privateTypes.command("start", async (ctx) => await ctx.reply(messages['start'], { reply_markup: homeMenu }));
-};
+    privateChatType.use(cancelMenu);
+    privateChatType.use(createConversation<BotContext>(work));
+    privateChatType.use(homeMenu);
+    privateChatType.use(createChooserMenu());
+
+    privateChatType.command("start", async (ctx) => {
+        // check if user is in db. if not, add him
+        const userId = ctx.from.id;
+        const userInDb = await users.findOne({ user_id: userId });
+        if (!userInDb) {
+            await users.insertOne({
+                user_id: userId,
+                answers: {},
+                status: {
+                    is_banned: false,
+                    is_accepted: false,
+                },
+                created_at: new Date(),
+                in_progress: null,
+            });
+        }
+
+        await ctx.reply(messages['start'], { reply_markup: homeMenu });
+    });
+}
 
 
-// All group stuff
-const groupActions = () => {
-    const groupTypes = bot.chatType(["group", "supergroup"]);
+function setupGroupActions(bot: Bot<ParseModeFlavor<BotContext>>) {
+    const groupChatType = bot.chatType(["group", "supergroup"]);
 
-    // if (configuration['gibberish_detection']) {
-    //     groupTypes.use(cancelTrainMenu);
-    //     groupTypes.use(createConversation<BotContext>(train));
-    //     groupTypes.use(trainMenu);
-    //     groupTypes.command("train", async (ctx) => await ctx.reply(messages['train_menu'], {reply_markup: trainMenu}));
-    // }
+    if (configuration['gibberish_detection']) {
+        groupChatType.use(cancelTrainMenu);
+        groupChatType.use(createConversation<BotContext>(training_mode, "train"));
+        groupChatType.use(trainMenu);
+        groupChatType.command("train", async (ctx) => await ctx.reply(messages['train_menu'], {reply_markup: trainMenu}));
+    }
 
-    groupTypes.on("::bot_command")
+    // Generic command layout for banning, unbanning and accepting users
+    const layout = groupChatType.on("::bot_command")
         .filter((ctx) => {
             const command = ctx.message!.text?.split(" ")[0];
             return command == "/ban" || command == "/unban" || command == "/accept";
@@ -114,7 +133,7 @@ const groupActions = () => {
             const user = await ctx.getAuthor();
             return user.status === "creator" || user.status === "administrator";
         })
-        .filter((ctx) => ctx.chat?.id == Deno.env.get("ADMIN_GROUP_ID"))
+        .filter((ctx) => ctx.chat?.id.toString() == Deno.env.get("ADMIN_GROUP_ID"))
         .filter((ctx) => {
             const text = ctx.message!.text!;
             const command: string[] = text.split(" ");
@@ -132,28 +151,23 @@ const groupActions = () => {
             return true;
         });
 
-    // groupTypes.command("ban", (ctx) => banCommand(ctx));
-    // groupTypes.command("unban", (ctx) => unbanCommand(ctx));
-    groupTypes.command("accept", (ctx) => acceptCommand(ctx));
-};
+    layout.command("ban", (ctx) => banCommand(ctx));
+    layout.command("unban", (ctx) => unbanCommand(ctx));
+    layout.command("accept", (ctx) => acceptCommand(ctx));
+}
 
+async function loadGibberishModel() {
+    try {
+        await reloadModel("gibberish/gib_model.json");
+    } catch (_error) {
+        console.log("No gibberish model found. Using default model.");
+        await reloadModel("gibberish/defaults/gib_model.json");
+        return;
+    }
+}
 
-// Call all functions
-privateActions();
-groupActions();
-
-// function loadGibberishModel() {
-//     let learningModel;
-//     if (fs.existsSync('gibberish/model.json')) {
-//         console.log("Loading gibberish model...");
-//         learningModel = fs.readFileSync('gibberish/model.json');
-//     } else {
-//         console.log("No gibberish model found. Using default model.");
-//         learningModel = fs.readFileSync('gibberish/defaults/model.json');
-//     }
-//     gibberish.set("model", JSON.parse(learningModel.toString()));
-// }
-
-
+if (configuration['gibberish_detection']) {
+    await loadGibberishModel();
+}
 console.log("Bot is now running");
 run(bot);
