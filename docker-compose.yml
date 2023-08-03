@@ -1,0 +1,28 @@
+services:
+    mongo:
+        image: mongo
+        container_name: mongo
+        restart: always
+        hostname: mongodb
+        ports:
+            - 27017:27017
+        volumes:
+            - ./mongo/data:/data/db
+            - ./mongo/initdb.d:/docker-entrypoint-initdb.d
+        environment:
+            # MONGO_INITDB_ROOT_USERNAME: root
+            # MONGO_INITDB_ROOT_PASSWORD: root
+            MONGO_INITDB_DATABASE: emperors-bot
+    bot:
+        depends_on:
+            - mongo
+        build:
+            context: ./bot/
+            dockerfile: Dockerfile
+        container_name: applications-bot
+        stop_signal: SIGINT
+        restart: on-failure
+        volumes: 
+            - ./bot/config:/app/applications-bot/bot/config
+            - ./bot/gibberish:/app/applications-bot/bot/gibberish
+        env_file: ./bot/.env
