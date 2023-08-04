@@ -9,9 +9,15 @@ import { testString } from "../gibberish.ts";
 export async function work(conversation: BotConversation, ctx: BotContext) {
     const chatId = ctx.chat!.id;
     const key = await users.findOne({ user_id: ctx.from?.id }).then((user) => user?.in_progress!);
+    if (key == null) {
+        console.log(`!!! [WORK] ${ctx.from?.id} tried to work but the current key is null`);
+        return;
+    }
     const answers: string[] = [];
     const questions = types[key]['questions'];
 
+    console.log(`[WORK] ${ctx.from?.id} is working on ${key}`);
+    
     for (const questionKey in questions) {
         const questionData = questions[questionKey];
 
@@ -68,17 +74,18 @@ export async function work(conversation: BotConversation, ctx: BotContext) {
     }
 
     const messageId = (await ctx.api.sendMessage(chatId, messages['sending_answers'])).message_id;
-    await conversation.external(async () => {
-        await users.updateOne({ user_id: ctx.from?.id }, {
+    await conversation.external(() => {
+        users.updateOne({ user_id: ctx.from?.id }, {
             $set: {
                 answers: {
                     [key]: answers
                 },
                 in_progress: null,
             }
+        }).then(async () => {
+            await sendAnswersToAdmin(ctx, key);
+            console.log(`[WORK] ${ctx.from?.id} finished working on ${key}`);
         });
-
-        await sendAnswersToAdmin(ctx, key)
     }).then(async () => {
         await ctx.api.editMessageText(chatId, messageId, messages['work_done']);
     }).catch(async (err) => {
@@ -120,6 +127,7 @@ async function sendAnswersToAdmin(ctx: BotContext, key: string) {
         userId: userId,
         userName: userName,
         link: link,
+        type: key
     });
     await ctx.api.sendMessage(logGroupId, message, { disable_web_page_preview: true });
 }
