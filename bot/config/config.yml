@@ -100,8 +100,10 @@ messages:
     new_application: |
         <b>New Staff Application!</b>
 
-        A new staff application has been submitted by <a href="tg://user?id={userId}">{userName}</a> [<code>{userId}</code>]. Please click the link below to view the answers:
-
+        A new staff application has been submitted by <a href="tg://user?id={userId}">{userName}</a> [<code>{userId}</code>]. 
+        Application Type: {type}
+        
+        Please click the link below to view the answers:
         <a href="{link}">Click here to view answers</a>
     accepted: |
         <b>Congratulations!</b>
