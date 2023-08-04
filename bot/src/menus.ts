@@ -17,6 +17,8 @@ export const cancelMenu = new Menu<BotContext>("cancel-menu", { autoAnswer: fals
                 return;
             }
 
+            console.log(`[WORK] ${ctx.from?.id} is no longer working on ${user.in_progress}`);
+
             await users.updateOne({ user_id: ctx.from?.id }, {
                 $set: {
                     in_progress: null,
@@ -26,7 +28,12 @@ export const cancelMenu = new Menu<BotContext>("cancel-menu", { autoAnswer: fals
                 await ctx.answerCallbackQuery();
                 await ctx.conversation.exit();
 
-                await ctx.reply(messages['work_cancelled'], { reply_markup: { remove_keyboard: true } });
+                await ctx.deleteMessage();
+                const message = await ctx.reply(messages['work_cancelled'], { reply_markup: { remove_keyboard: true } });
+                setTimeout(async () => {
+                    // @ts-ignore - this is a bug in the typescript definitions
+                    await message.delete().catch(() => {});
+                }, 3000);
             });
         });
     });
@@ -79,6 +86,7 @@ export function createChooserMenu() {
                         }
                     }).then(async () => {
                         await ctx.answerCallbackQuery();
+                        await ctx.deleteMessage();
                         await ctx.conversation.enter('work');
                     });
                 });

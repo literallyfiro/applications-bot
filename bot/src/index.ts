@@ -8,6 +8,7 @@ import { hydrateReply, parseMode } from "https://deno.land/x/grammy_parse_mode@1
 import { ParseModeFlavor } from "https://deno.land/x/grammy_parse_mode@1.7.1/mod.ts";
 import { autoRetry } from "https://esm.sh/@grammyjs/auto-retry@1.1.1";
 import { MongoClient, ObjectId } from "https://deno.land/x/mongo@v0.31.2/mod.ts";
+import { hydrate, HydrateFlavor } from "https://deno.land/x/grammy_hydrate@v1.3.1/mod.ts";
 import { cancelMenu, homeMenu, createChooserMenu, cancelTrainMenu, trainMenu } from "./menus.ts";
 import { work } from "./conversations/application.ts";
 import { configuration, messages } from "./config.ts";
@@ -18,7 +19,7 @@ import { reloadModel } from "./gibberish.ts";
 import { training_mode } from "./conversations/training.ts";
 import { resetCommand } from "./commands/reset.ts";
 
-export type BotContext = Context & ConversationFlavor & SessionFlavor<Context>;
+export type BotContext = Context & ConversationFlavor & SessionFlavor<Context> & HydrateFlavor<Context>;
 export type BotConversation = Conversation<BotContext>;
 
 export interface UserSchema {
@@ -60,6 +61,8 @@ async function setupDatabase() {
 function setupBot() {
     const bot = new Bot<ParseModeFlavor<BotContext>>(Deno.env.get("BOT_TOKEN")!);
 
+    // Install Hydration plugin
+    bot.use(hydrate());
     // Install parse mode plugin
     bot.use(hydrateReply);
     // Install session plugin
